@@ -23,7 +23,7 @@ export const ProductivePaceChart = ({
   todayAvg,
 }: ProductivePaceChartProps) => {
   return (
-    <ResponsiveContainer width="100%" height="100%">
+    <ResponsiveContainer width="80%" height="70%">
       <AreaChart
         width={500}
         height={400}

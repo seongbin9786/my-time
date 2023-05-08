@@ -37,8 +37,8 @@ export const FlowStatusChart = ({ data, ratio }: FlowStatusChartProps) => {
   return (
     <div
       style={{
-        width: '50vh',
-        height: '40vh',
+        width: '100%',
+        height: '100%',
       }}
     >
       <div style={{ display: 'flex', gap: 4 }}>
@@ -52,7 +52,7 @@ export const FlowStatusChart = ({ data, ratio }: FlowStatusChartProps) => {
           재시도: {totalTryAgain * -1} (상위 {totalTryAgainRatio}%)
         </span>
       </div>
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer width="80%" height="70%">
         <ComposedChart
           stackOffset="sign"
           width={500}
