@@ -9,7 +9,10 @@ import {
   YAxis,
 } from 'recharts';
 
-import { ProductivePace } from '../../assets/api/ProductivePaceData';
+import {
+  ProductivePace,
+  simulateProductivePace,
+} from '../../assets/api/ProductivePaceData';
 
 interface ProductivePaceChartProps {
   data: ProductivePace[];
@@ -22,12 +25,14 @@ export const ProductivePaceChart = ({
   totalAvg,
   todayAvg,
 }: ProductivePaceChartProps) => {
+  const simulated = simulateProductivePace(data);
+
   return (
     <ResponsiveContainer width="80%" height="70%">
       <AreaChart
         width={500}
         height={400}
-        data={data}
+        data={simulated}
         margin={{
           top: 10,
           right: 30,

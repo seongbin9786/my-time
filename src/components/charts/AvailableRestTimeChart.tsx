@@ -23,7 +23,7 @@ const timeStrOf = (minutes: number) => {
   return `${append0(h)}:${append0(m)}`;
 };
 
-const UNIT = 30;
+const UNIT = 60;
 
 const simulate = (logs: Log[]) => {
   const result = [];
