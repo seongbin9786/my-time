@@ -1,23 +1,22 @@
+// format: [hh:mm -> hh:mm] (+|-) text
 const TIME_RANGE_AND_TEXT_REGEXP = new RegExp(
   /\[((?:[0-9|:])+) -> ((?:[0-9|:])+)\] ([+|-]) (.+)/
 );
 
-export const extractTimeRangeAndText = (str: string) => {
-  const extracted = TIME_RANGE_AND_TEXT_REGEXP.exec(str);
-
-  if (!extracted) {
-    throw new Error(`extractTimeRangeAndText - bad format: ${str}`);
-  }
-  return extracted;
-};
-
+// format: [hh:mm] (+|-) text
 const TIME_AND_TEXT_REGEXP = new RegExp(/\[((?:[0-9|:])+)\] (.+)/);
 
-export const extractTimeAndText = (str: string) => {
-  const extracted = TIME_AND_TEXT_REGEXP.exec(str);
+const extractUsingRegExp = (regExp: RegExp) => (str: string) => {
+  const extracted = regExp.exec(str);
 
   if (!extracted) {
-    throw new Error(`extractTimeAndText - bad format: ${str}`);
+    throw new Error(`extractUsingRegExp - bad format: ${str}`);
   }
   return extracted;
 };
+
+export const extractTimeRangeAndText = extractUsingRegExp(
+  TIME_RANGE_AND_TEXT_REGEXP
+);
+
+export const extractTimeAndText = extractUsingRegExp(TIME_AND_TEXT_REGEXP);
