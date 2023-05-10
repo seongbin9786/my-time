@@ -7,8 +7,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview",
-    "today": "node --experimental-specifier-resolution=node --loader ts-node/esm ./src/utils/createTodayChartData.ts"
+    "preview": "vite preview"
   },
   "dependencies": {
     "react": "^18.2.0",
@@ -35,7 +34,6 @@
     "eslint-plugin-tailwindcss": "^3.11.0",
     "eslint-plugin-unused-imports": "^2.0.0",
     "prettier": "^2.8.8",
-    "ts-node": "^10.9.1",
     "typescript": "^5.0.2",
     "vite": "^4.3.2"
   }
