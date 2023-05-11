@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import {
   getDateStringDayAfter,
@@ -7,6 +7,26 @@ import {
 } from '../../utils/DateUtil';
 import { loadFromStorage, saveToStorage } from '../../utils/Storage';
 import { convertTimeFormat } from '../../utils/TimeFormatConverter';
+
+/**
+ * 다른 탭에서 발생한 storage 이벤트를 받아 실시간 최신 값으로 갱신
+ */
+const listneOnChangesFromAnotherTab = (
+  currentDate: string,
+  setRawLog: (log: string) => void
+) => {
+  window.addEventListener('storage', (e: StorageEvent) => {
+    const { key, newValue } = e;
+    // 값 변경 case가 아닌 경우
+    if (!key || !newValue) {
+      return;
+    }
+    // 보고 있는 날짜일 때만 갱신
+    if (key === currentDate) {
+      setRawLog(newValue);
+    }
+  });
+};
 
 interface TextLogContainerProps {
   onLogUpdate: (result: string) => void;
@@ -45,6 +65,10 @@ export const TextLogContainer = ({ onLogUpdate }: TextLogContainerProps) => {
     setRawLog(nextRawLog);
     saveToStorage(currentDate, nextRawLog);
   };
+
+  useEffect(() => {
+    listneOnChangesFromAnotherTab(currentDate, setRawLog);
+  }, []);
 
   return (
     <div
