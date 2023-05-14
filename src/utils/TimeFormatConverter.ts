@@ -1,4 +1,33 @@
+import { timeStringToMinutes } from './DateUtil';
 import { extractTimeAndText } from './TimeRangeFormatter';
+
+/**
+ * 로그에 현재 시간을 추가하여 실시간 현황을 볼 수 있게 한다.
+ *
+ * @param str 원본 로그
+ * @param result 수정 후 로그
+ * @returns 현재 시간의 기록을 추가한 result(수정 후 로그)
+ *
+ * TODO: 해당 메소드 호출을 화면 revisit할 때마다 해야 함
+ */
+const addCurrentTime = (str: string[], result: string[]) => {
+  const lastLog = str[str.length - 1];
+  const [, startedAt, prevText] = extractTimeAndText(lastLog);
+
+  // <수면> 키워드가 있으면 종료한다.
+  if (lastLog.includes('수면')) {
+    return;
+  }
+
+  const now = new Date();
+  // 24시간이 넘으면 다음 날로 가기 때문에, 00:00으로 초기화되는데, 여기에 24시간을 더해줘야 한다.
+  const hours =
+    timeStringToMinutes(startedAt) >= 24 * 60
+      ? now.getHours() + 24
+      : now.getHours();
+  const minutes = now.getMinutes();
+  result.push(`[${startedAt} -> ${hours}:${minutes}] ${prevText}`);
+};
 
 /**
  * @param rawLogs [hh:mm] str
@@ -26,10 +55,7 @@ export const convertTimeFormat = (rawLogs: string) => {
     result.push(`[${startedAt} -> ${endedAt}] ${prevText}`);
   }
 
-  const [, startedAt, prevText] = extractTimeAndText(str[str.length - 1]);
-  result.push(
-    `[${startedAt} -> ${new Date().getHours()}:${new Date().getMinutes()}] ${prevText}`
-  );
+  addCurrentTime(str, result);
 
   return result.join('\n');
 };

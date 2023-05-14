@@ -8,10 +8,8 @@ import {
   YAxis,
 } from 'recharts';
 
-import {
-  levelOutAvailableRestTimeLogs,
-  Log,
-} from '../../assets/api/AvailableRestTimeData';
+import { Log } from '../../assets/api/AvailableRestTimeData';
+import { minutesToTimeString } from '../../utils/DateUtil';
 
 interface AvailableRestTimeChartProps {
   logs: Log[];
@@ -20,14 +18,12 @@ interface AvailableRestTimeChartProps {
 export const AvailableRestTimeChart = ({
   logs,
 }: AvailableRestTimeChartProps) => {
-  const data = levelOutAvailableRestTimeLogs(logs).map(
-    ({ name, productive, wasted }) => ({
-      name,
-      productive,
-      wasted,
-      need: wasted - productive,
-    })
-  );
+  const data = logs.map(({ offset, productive, wasted }) => ({
+    offset,
+    productive,
+    wasted,
+    need: wasted - productive,
+  }));
 
   const gradientOffset = () => {
     const dataMax = Math.max(...data.map((i) => i.need));
@@ -45,6 +41,8 @@ export const AvailableRestTimeChart = ({
 
   const off = gradientOffset();
 
+  console.log(data);
+
   return (
     <ResponsiveContainer width="80%" height="70%">
       <AreaChart
@@ -59,9 +57,14 @@ export const AvailableRestTimeChart = ({
         }}
       >
         <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="name" />
+        <XAxis
+          dataKey="offset"
+          type="number"
+          tickFormatter={minutesToTimeString}
+          domain={[8 * 60, 27 * 60]}
+        />
         <YAxis />
-        <Tooltip />
+        <Tooltip labelFormatter={minutesToTimeString} />
         <defs>
           <linearGradient id="splitColor" x1="0" y1="0" x2="0" y2="1">
             <stop offset={off} stopColor="red" stopOpacity={1} />
@@ -71,6 +74,7 @@ export const AvailableRestTimeChart = ({
         <Area
           type="monotone"
           dataKey="need"
+          unit="min"
           stroke="#000"
           fill="url(#splitColor)"
         />

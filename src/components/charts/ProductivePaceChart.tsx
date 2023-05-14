@@ -9,10 +9,8 @@ import {
   YAxis,
 } from 'recharts';
 
-import {
-  levelOutProductivePace,
-  ProductivePace,
-} from '../../assets/api/ProductivePaceData';
+import { ProductivePace } from '../../assets/api/ProductivePaceData';
+import { minutesToTimeString } from '../../utils/DateUtil';
 
 interface ProductivePaceChartProps {
   data: ProductivePace[];
@@ -25,14 +23,12 @@ export const ProductivePaceChart = ({
   totalAvg,
   todayAvg,
 }: ProductivePaceChartProps) => {
-  const leveledData = levelOutProductivePace(data);
-
   return (
     <ResponsiveContainer width="80%" height="70%">
       <AreaChart
         width={500}
         height={400}
-        data={leveledData}
+        data={data}
         margin={{
           top: 10,
           right: 30,
@@ -41,9 +37,14 @@ export const ProductivePaceChart = ({
         }}
       >
         <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="name" />
+        <XAxis
+          dataKey="offset"
+          type="number"
+          tickFormatter={minutesToTimeString}
+          domain={[8 * 60, 27 * 60]}
+        />
         <YAxis domain={[0, 60]} allowDataOverflow={true} />
-        <Tooltip />
+        <Tooltip labelFormatter={minutesToTimeString} />
         <ReferenceLine y={40} stroke="red" label="목표 평균: 40min/h" />
         <ReferenceLine
           y={totalAvg}

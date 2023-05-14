@@ -1,6 +1,11 @@
 import { timeStringToMinutes } from './DateUtil';
 import { extractTimeRangeAndText } from './TimeRangeFormatter';
 
+const minutesOf = (timeStr: string) => {
+  const [h, m] = timeStr.split(':');
+  return Number.parseInt(h) * 60 + Number.parseInt(m);
+};
+
 const diffBetweenTimeStrings = (startedAt: string, endedAt: string) =>
   timeStringToMinutes(endedAt) - timeStringToMinutes(startedAt);
 
@@ -31,14 +36,14 @@ export const transformLogsToChartFormat = (rawLogs: string) => {
   // 첫번째 로그
   const initialData = [
     {
-      name: wokeUpAt,
+      offset: minutesOf(wokeUpAt),
       direction: '',
       productive: 0,
       wasted: 0,
       pace: 0,
     },
     {
-      name: endedAt, // endedAt
+      offset: minutesOf(endedAt),
       direction: productive ? 'productive' : 'wasted',
       productive: curProductive,
       wasted: !productive ? delta : 0,
@@ -56,7 +61,7 @@ export const transformLogsToChartFormat = (rawLogs: string) => {
     const curProductive = prevProductive + (productive ? delta : 0);
 
     result.push({
-      name: endedAt,
+      offset: minutesOf(endedAt),
       direction: productive ? 'productive' : 'wasted',
       productive: curProductive,
       wasted: prevWasted + (!productive ? delta : 0),

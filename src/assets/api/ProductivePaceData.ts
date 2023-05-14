@@ -1,7 +1,7 @@
-import { minutesToTimeString, timeStringToMinutes } from '../../utils/DateUtil';
+import { minutesToTimeString } from '../../utils/DateUtil';
 
 export interface ProductivePace {
-  name: string;
+  offset: number;
   pace: number;
 }
 
@@ -20,8 +20,8 @@ export const levelOutProductivePace = (logs: ProductivePace[]) => {
   for (let i = 1; i < logs.length; i++) {
     const curLog = logs[i - 1];
     const nextLog = logs[i];
-    const curMinutes = timeStringToMinutes(curLog.name);
-    const nextMinutes = timeStringToMinutes(nextLog.name);
+    const curMinutes = curLog.offset;
+    const nextMinutes = nextLog.offset;
     const timeDiff = nextMinutes - curMinutes;
     const paceDiff = nextLog.pace - curLog.pace;
     const numOfBlocks =
@@ -32,7 +32,7 @@ export const levelOutProductivePace = (logs: ProductivePace[]) => {
 
     for (let j = 1; j < numOfBlocks; j++) {
       result.push({
-        name: minutesToTimeString(timeStringToMinutes(curLog.name) + UNIT * j),
+        name: minutesToTimeString(curLog.offset + UNIT * j),
         pace: Math.floor(curLog.pace + (paceDiff / numOfBlocks) * j),
       });
     }
