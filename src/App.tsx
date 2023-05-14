@@ -1,11 +1,7 @@
-import { PropsWithChildren, useMemo, useState } from 'react';
+import { PropsWithChildren, useState } from 'react';
 
-import { FLOW_EXAPLE_DATA, FLOW_EXAPLE_RATIO } from './assets/api/FlowData';
-import { PLAN_BURNDOWN_DATA } from './assets/api/PlanBurdownData';
 import { avgPaceOf } from './assets/api/ProductivePaceData';
 import { AvailableRestTimeChart } from './components/charts/AvailableRestTimeChart';
-import { FlowStatusChart } from './components/charts/FlowStatusChart';
-import { PlanBurndownChart } from './components/charts/PlanBurndownChart';
 import { ProductivePaceChart } from './components/charts/ProductivePaceChart';
 import { TextLogContainer } from './components/texts/TextLogContainer';
 import { transformLogsToChartFormat } from './utils/ChartFormatTransformer';
@@ -22,17 +18,13 @@ const Container = (props: PropsWithChildren) => (
 
 export const App = () => {
   const [rawLog, setRawLog] = useState('');
-  const actualLog = useMemo(() => {
+  const actualLog = (() => {
     try {
       return transformLogsToChartFormat(rawLog);
-    } catch (e) {
-      console.log(e);
+    } catch {
+      return [];
     }
-    return [
-      { name: '00:00', direction: '', productive: 0, wasted: 0, pace: 0 },
-      { name: '24:00', direction: '', productive: 0, wasted: 0, pace: 0 },
-    ];
-  }, [rawLog]);
+  })();
 
   return (
     <div
@@ -56,15 +48,6 @@ export const App = () => {
           totalAvg={35}
           todayAvg={avgPaceOf(actualLog)}
         />
-      </Container>
-      <Container>
-        <h1>[몰입 모니터링]</h1>
-        <h2>"난도를 낮추면 더 재밌을 것 같다"</h2>
-        <FlowStatusChart data={FLOW_EXAPLE_DATA} ratio={FLOW_EXAPLE_RATIO} />
-      </Container>
-      <Container>
-        <h1>[계획 달성률]</h1>
-        <PlanBurndownChart data={PLAN_BURNDOWN_DATA} />
       </Container>
     </div>
   );
