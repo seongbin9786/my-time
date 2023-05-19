@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import {
   getDateStringDayAfter,
@@ -6,12 +6,11 @@ import {
   getTodayString,
 } from '../../utils/DateUtil';
 import { loadFromStorage, saveToStorage } from '../../utils/Storage';
-import { convertTimeFormat } from '../../utils/TimeFormatConverter';
 
 /**
  * 다른 탭에서 발생한 storage 이벤트를 받아 실시간 최신 값으로 갱신
  */
-const listneOnChangesFromAnotherTab = (
+const listenOnChangesFromAnotherTab = (
   currentDate: string,
   setRawLog: (log: string) => void
 ) => {
@@ -32,22 +31,14 @@ interface TextLogContainerProps {
   onLogUpdate: (result: string) => void;
 }
 
+type DateProvider = (date: string) => string;
+
 export const TextLogContainer = ({ onLogUpdate }: TextLogContainerProps) => {
   const [currentDate, setCurrentDate] = useState(getTodayString());
   const [rawLog, setRawLog] = useState(loadFromStorage(currentDate));
-  const formatted = useMemo(() => {
-    // memoize
-    try {
-      const result = convertTimeFormat(rawLog);
-      onLogUpdate(result);
-      return result;
-    } catch (e) {
-      console.log(e);
-    }
-    return 'error!';
-  }, [rawLog]);
 
-  const goToDate = (dateProvider: (currentDate: string) => string) => {
+  // TODO: 이걸 useLocalStorage로 뺄 수 있을까?
+  const goToDate = (dateProvider: DateProvider) => {
     saveToStorage(currentDate, rawLog);
 
     const targetDate = dateProvider(currentDate);
@@ -67,7 +58,8 @@ export const TextLogContainer = ({ onLogUpdate }: TextLogContainerProps) => {
   };
 
   useEffect(() => {
-    listneOnChangesFromAnotherTab(currentDate, setRawLog);
+    onLogUpdate(rawLog);
+    listenOnChangesFromAnotherTab(currentDate, setRawLog);
   }, []);
 
   return (
@@ -101,20 +93,11 @@ export const TextLogContainer = ({ onLogUpdate }: TextLogContainerProps) => {
       <textarea
         style={{
           width: '100%',
-          height: '40%',
+          height: '85%',
           fontSize: 16,
         }}
         value={rawLog}
         onChange={handleChange}
-      />
-      <textarea
-        style={{
-          width: '100%',
-          height: '40%',
-          fontSize: 16,
-        }}
-        value={formatted}
-        disabled
       />
     </div>
   );

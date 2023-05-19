@@ -9,19 +9,21 @@ import {
   YAxis,
 } from 'recharts';
 
-import { ProductivePace } from '../../assets/api/ProductivePaceData';
 import { minutesToTimeString } from '../../utils/DateUtil';
+import { Log } from '../../utils/PaceUtil';
 
 interface ProductivePaceChartProps {
-  data: ProductivePace[];
+  data: Log[];
   totalAvg: number;
   todayAvg: number;
+  targetPace: number;
 }
 
 export const ProductivePaceChart = ({
   data,
   totalAvg,
   todayAvg,
+  targetPace,
 }: ProductivePaceChartProps) => {
   return (
     <ResponsiveContainer width="80%" height="70%">
@@ -45,7 +47,11 @@ export const ProductivePaceChart = ({
         />
         <YAxis domain={[0, 60]} allowDataOverflow={true} />
         <Tooltip labelFormatter={minutesToTimeString} />
-        <ReferenceLine y={40} stroke="red" label="목표 평균: 40min/h" />
+        <ReferenceLine
+          y={targetPace}
+          stroke="red"
+          label={`목표: ${targetPace}min/h`}
+        />
         <ReferenceLine
           y={totalAvg}
           stroke="blue"

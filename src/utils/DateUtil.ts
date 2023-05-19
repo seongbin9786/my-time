@@ -1,4 +1,4 @@
-const append0 = (num: number) => (num <= 9 ? `0${num}` : num + '');
+export const append0 = (num: number) => (num <= 9 ? `0${num}` : num + '');
 
 export const getDateString = (date: Date) => {
   return `${date.getFullYear()}-${append0(date.getMonth() + 1)}-${append0(
@@ -8,11 +8,13 @@ export const getDateString = (date: Date) => {
 
 export const getTodayString = () => getDateString(new Date());
 
+const HOURS_OF_24 = 24 * 60 * 60 * 1000;
+
 export const getDateStringDayBefore = (date: string) =>
-  getDateString(new Date(new Date(date).getTime() - 24 * 60 * 60 * 1000));
+  getDateString(new Date(new Date(date).getTime() - HOURS_OF_24));
 
 export const getDateStringDayAfter = (date: string) =>
-  getDateString(new Date(new Date(date).getTime() + 24 * 60 * 60 * 1000));
+  getDateString(new Date(new Date(date).getTime() + HOURS_OF_24));
 
 /**
  * @param timeStr hh:mm

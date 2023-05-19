@@ -8,8 +8,8 @@ import {
   YAxis,
 } from 'recharts';
 
-import { Log } from '../../assets/api/AvailableRestTimeData';
 import { minutesToTimeString } from '../../utils/DateUtil';
+import { Log } from '../../utils/PaceUtil';
 
 interface AvailableRestTimeChartProps {
   logs: Log[];
@@ -40,8 +40,6 @@ export const AvailableRestTimeChart = ({
   };
 
   const off = gradientOffset();
-
-  console.log(data);
 
   return (
     <ResponsiveContainer width="80%" height="70%">
