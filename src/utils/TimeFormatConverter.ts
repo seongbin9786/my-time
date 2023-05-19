@@ -1,4 +1,4 @@
-import { timeStringToMinutes } from './DateUtil';
+import { append0, timeStringToMinutes } from './DateUtil';
 import { extractTimeAndText } from './TimeRangeFormatter';
 
 /**
@@ -26,7 +26,9 @@ const addCurrentTime = (str: string[], result: string[]) => {
       ? now.getHours() + 24
       : now.getHours();
   const minutes = now.getMinutes();
-  result.push(`[${startedAt} -> ${hours}:${minutes}] ${prevText}`);
+  result.push(
+    `[${startedAt} -> ${append0(hours)}:${append0(minutes)}] ${prevText}`
+  );
 };
 
 /**
