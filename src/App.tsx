@@ -1,4 +1,4 @@
-import { ChangeEvent, PropsWithChildren, useState } from 'react';
+import { ChangeEvent, PropsWithChildren, useEffect, useState } from 'react';
 
 import { AvailableRestTimeChart } from './components/charts/AvailableRestTimeChart';
 import { ProductivePaceChart } from './components/charts/ProductivePaceChart';
@@ -6,6 +6,14 @@ import { TextLogContainer } from './components/texts/TextLogContainer';
 import { createLogsFromString } from './utils/LogConverter';
 import { avgPaceOf } from './utils/PaceUtil';
 import { loadFromStorage, saveToStorage } from './utils/Storage';
+
+const installOnWindowFocusHandler = (handler: () => void) => {
+  window.addEventListener('visibilitychange', handler);
+};
+
+const removeOnWindowFocusHandler = (handler: () => void) => {
+  window.removeEventListener('visibilitychange', handler);
+};
 
 const Container = (props: PropsWithChildren) => (
   <div
@@ -31,6 +39,17 @@ export const App = () => {
     setTargetPace(nextPace);
     saveToStorage(TARGET_PACE, nextPace + '');
   };
+
+  useEffect(() => {
+    const handler = () => {
+      if (document.visibilityState !== 'visible') {
+        return;
+      }
+      setRawLogs((rawLogs) => rawLogs + ' '); // 어차피 trim 되어 처리됨
+    };
+    installOnWindowFocusHandler(handler);
+    return () => removeOnWindowFocusHandler(handler);
+  }, []);
 
   return (
     <div

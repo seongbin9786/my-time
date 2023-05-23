@@ -54,6 +54,7 @@ export const TextLogContainer = ({ onLogUpdate }: TextLogContainerProps) => {
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const nextRawLog = e.target.value;
     setRawLog(nextRawLog);
+    onLogUpdate(nextRawLog);
     saveToStorage(currentDate, nextRawLog);
   };
 
