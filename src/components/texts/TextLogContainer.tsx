@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import {
   getDateStringDayAfter,
@@ -34,8 +34,26 @@ interface TextLogContainerProps {
 type DateProvider = (date: string) => string;
 
 export const TextLogContainer = ({ onLogUpdate }: TextLogContainerProps) => {
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const [currentDate, setCurrentDate] = useState(getTodayString());
   const [rawLog, setRawLog] = useState(loadFromStorage(currentDate));
+
+  console.log('TextCon really loaded? ', rawLog);
+
+  const focusInput = () => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  };
+
+  // 최근에 닫았던 탭을 다시 살리는 경우, input value가 채워진 상태로 켜짐.
+  // 강제로 value를 rawLog로 동기화시킴.
+  // 최초 렌더링 직후에 자동으로 채워진 텍스트는 안 보이게 됨.
+  const synchronizeInput = () => {
+    if (inputRef.current) {
+      inputRef.current.value = rawLog;
+    }
+  };
 
   // TODO: 이걸 useLocalStorage로 뺄 수 있을까?
   const goToDate = (dateProvider: DateProvider) => {
@@ -45,6 +63,7 @@ export const TextLogContainer = ({ onLogUpdate }: TextLogContainerProps) => {
     const targetLog = loadFromStorage(targetDate);
     setCurrentDate(targetDate);
     setRawLog(targetLog);
+    focusInput();
   };
 
   const goToToday = () => goToDate(getTodayString);
@@ -59,6 +78,7 @@ export const TextLogContainer = ({ onLogUpdate }: TextLogContainerProps) => {
   };
 
   useEffect(() => {
+    synchronizeInput();
     onLogUpdate(rawLog);
     listenOnChangesFromAnotherTab(currentDate, setRawLog);
   }, []);
@@ -98,6 +118,7 @@ export const TextLogContainer = ({ onLogUpdate }: TextLogContainerProps) => {
           fontSize: 16,
         }}
         value={rawLog}
+        ref={inputRef}
         onChange={handleChange}
       />
     </div>
