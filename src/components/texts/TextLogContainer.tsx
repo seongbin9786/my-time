@@ -38,8 +38,6 @@ export const TextLogContainer = ({ onLogUpdate }: TextLogContainerProps) => {
   const [currentDate, setCurrentDate] = useState(getTodayString());
   const [rawLog, setRawLog] = useState(loadFromStorage(currentDate));
 
-  console.log('TextCon really loaded? ', rawLog);
-
   const focusInput = () => {
     if (inputRef.current) {
       inputRef.current.focus();
@@ -79,6 +77,7 @@ export const TextLogContainer = ({ onLogUpdate }: TextLogContainerProps) => {
 
   useEffect(() => {
     synchronizeInput();
+    focusInput();
     onLogUpdate(rawLog);
     listenOnChangesFromAnotherTab(currentDate, setRawLog);
   }, []);
