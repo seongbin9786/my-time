@@ -10,11 +10,11 @@ import { loadFromStorage, saveToStorage } from '../../utils/Storage';
 /**
  * 다른 탭에서 발생한 storage 이벤트를 받아 실시간 최신 값으로 갱신
  */
-const listenOnChangesFromAnotherTab = (
+const createRemoteChangeListener = (
   currentDate: string,
   setRawLog: (log: string) => void
 ) => {
-  window.addEventListener('storage', (e: StorageEvent) => {
+  const listener = (e: StorageEvent) => {
     const { key, newValue } = e;
     // 값 변경 case가 아닌 경우
     if (!key || !newValue) {
@@ -24,7 +24,12 @@ const listenOnChangesFromAnotherTab = (
     if (key === currentDate) {
       setRawLog(newValue);
     }
-  });
+  };
+  window.addEventListener('storage', listener);
+  console.log('added new listener at ', currentDate);
+
+  // 해당 리스너를 반환해야 삭제 가능
+  return listener;
 };
 
 interface TextLogContainerProps {
@@ -34,9 +39,15 @@ interface TextLogContainerProps {
 type DateProvider = (date: string) => string;
 
 export const TextLogContainer = ({ onLogUpdate }: TextLogContainerProps) => {
+  // useState, useRef의 초기값은 함수인 경우 최초 1회만 실행하고 평가가 반복되지 않음.
+  // 그 외의 경우는 평가는 하되 무시함. 매번 실행되는 이유는 인자이기 때문인 듯.
+  // 참고: https://legacy.reactjs.org/docs/hooks-reference.html#lazy-initial-state
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  const [currentDate, setCurrentDate] = useState(getTodayString());
-  const [rawLog, setRawLog] = useState(loadFromStorage(currentDate));
+  const [currentDate, setCurrentDate] = useState(getTodayString);
+  const [rawLog, setRawLog] = useState(() => loadFromStorage(currentDate));
+  const listenerRef = useRef<(e: StorageEvent) => void>(() =>
+    createRemoteChangeListener(currentDate, setRawLog)
+  );
 
   const focusInput = () => {
     if (inputRef.current) {
@@ -53,6 +64,12 @@ export const TextLogContainer = ({ onLogUpdate }: TextLogContainerProps) => {
     }
   };
 
+  const changeRemoteListenerForNewDate = (targetDate: string) => {
+    console.log('removed old listener at ', targetDate);
+    window.removeEventListener('storage', listenerRef.current);
+    listenerRef.current = createRemoteChangeListener(targetDate, setRawLog);
+  };
+
   // TODO: 이걸 useLocalStorage로 뺄 수 있을까?
   const goToDate = (dateProvider: DateProvider) => {
     saveToStorage(currentDate, rawLog);
@@ -62,6 +79,7 @@ export const TextLogContainer = ({ onLogUpdate }: TextLogContainerProps) => {
     setCurrentDate(targetDate);
     setRawLog(targetLog);
     focusInput();
+    changeRemoteListenerForNewDate(targetDate);
   };
 
   const goToToday = () => goToDate(getTodayString);
@@ -79,7 +97,6 @@ export const TextLogContainer = ({ onLogUpdate }: TextLogContainerProps) => {
     synchronizeInput();
     focusInput();
     onLogUpdate(rawLog);
-    listenOnChangesFromAnotherTab(currentDate, setRawLog);
   }, []);
 
   return (
