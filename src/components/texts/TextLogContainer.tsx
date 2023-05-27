@@ -78,6 +78,7 @@ export const TextLogContainer = ({ onLogUpdate }: TextLogContainerProps) => {
     const targetLog = loadFromStorage(targetDate);
     setCurrentDate(targetDate);
     setRawLog(targetLog);
+    onLogUpdate(targetLog);
     focusInput();
     changeRemoteListenerForNewDate(targetDate);
   };
