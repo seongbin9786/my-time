@@ -1,15 +1,7 @@
-import { timeStringToMinutes } from './DateUtil';
+import { diffBetweenTimeStrings, getTodayString, minutesOf } from './DateUtil';
 import { divideLogsIntoTimeUnit, Log } from './PaceUtil';
 import { convertTimeFormat } from './TimeFormatConverter';
 import { extractTimeRangeAndText } from './TimeRangeFormatter';
-
-const minutesOf = (timeStr: string) => {
-  const [h, m] = timeStr.split(':');
-  return Number.parseInt(h) * 60 + Number.parseInt(m);
-};
-
-const diffBetweenTimeStrings = (startedAt: string, endedAt: string) =>
-  timeStringToMinutes(endedAt) - timeStringToMinutes(startedAt);
 
 interface TempLogFormat {
   startedAt: string;
@@ -86,9 +78,13 @@ const generateAccumulatedLog = (rawLogs: string): Log[] => {
 
 // TODO: 현재 시각보다 뒤의 시각 입력 시 오류를 알려야 함.
 // --> time format할 때와 addCurrentTime할 때 알 수 있음.
-export const createLogsFromString = (rawLog: string) => {
+export const createLogsFromString = (
+  rawLog: string,
+  targetDay: string,
+  today: string = getTodayString()
+) => {
   try {
-    const formatted = convertTimeFormat(rawLog);
+    const formatted = convertTimeFormat(rawLog, targetDay, today);
     const accumulated = generateAccumulatedLog(formatted);
     return divideLogsIntoTimeUnit(accumulated);
   } catch (e) {

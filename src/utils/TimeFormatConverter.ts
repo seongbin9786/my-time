@@ -1,4 +1,4 @@
-import { append0, timeStringToMinutes } from './DateUtil';
+import { append0, diffMoreThanOneDay, timeStringToMinutes } from './DateUtil';
 import { extractTimeAndText } from './TimeRangeFormatter';
 
 /**
@@ -15,6 +15,7 @@ const addCurrentTime = (str: string[], result: string[]) => {
   const [, startedAt, prevText] = extractTimeAndText(lastLog);
 
   // <수면> 키워드가 있으면 종료한다.
+  // 오늘과 하루 이상 차이나도 addCurrentTime을 호출하지 않아야 함
   if (lastLog.includes('수면')) {
     return;
   }
@@ -35,7 +36,11 @@ const addCurrentTime = (str: string[], result: string[]) => {
  * @param rawLogs [hh:mm] str
  * @returns [hh:mm -> hh:mm] str
  */
-export const convertTimeFormat = (rawLogs: string) => {
+export const convertTimeFormat = (
+  rawLogs: string,
+  targetDay: string,
+  today: string
+) => {
   const str = rawLogs.trim().split('\n');
 
   const result = [];
@@ -57,7 +62,11 @@ export const convertTimeFormat = (rawLogs: string) => {
     result.push(`[${startedAt} -> ${endedAt}] ${prevText}`);
   }
 
-  addCurrentTime(str, result);
+  // 어제 이전 날짜는 해당되지 않음.
+  // 24시간 차이가 최대한 나도 어제 오전임.
+  if (!diffMoreThanOneDay(targetDay, today)) {
+    addCurrentTime(str, result);
+  }
 
   return result.join('\n');
 };

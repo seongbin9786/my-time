@@ -1,11 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useSelector } from 'react-redux';
 
-import {
-  getDateStringDayAfter,
-  getDateStringDayBefore,
-  getTodayString,
-} from '../../utils/DateUtil';
+import { RootState } from '../../store';
 import { loadFromStorage, saveToStorage } from '../../utils/Storage';
+import { DayNavigator } from '../days/DayNavigator';
 
 /**
  * 다른 탭에서 발생한 storage 이벤트를 받아 실시간 최신 값으로 갱신
@@ -36,14 +34,14 @@ interface TextLogContainerProps {
   onLogUpdate: (result: string) => void;
 }
 
-type DateProvider = (date: string) => string;
-
 export const TextLogContainer = ({ onLogUpdate }: TextLogContainerProps) => {
   // useState, useRef의 초기값은 함수인 경우 최초 1회만 실행하고 평가가 반복되지 않음.
   // 그 외의 경우는 평가는 하되 무시함. 매번 실행되는 이유는 인자이기 때문인 듯.
   // 참고: https://legacy.reactjs.org/docs/hooks-reference.html#lazy-initial-state
+  const prevDateRef = useRef<string | null>(null);
+  const prevDate = prevDateRef.current;
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  const [currentDate, setCurrentDate] = useState(getTodayString);
+  const currentDate = useSelector((state: RootState) => state.currentDate);
   const [rawLog, setRawLog] = useState(() => loadFromStorage(currentDate));
   const listenerRef = useRef<(e: StorageEvent) => void>(() =>
     createRemoteChangeListener(currentDate, setRawLog)
@@ -70,22 +68,17 @@ export const TextLogContainer = ({ onLogUpdate }: TextLogContainerProps) => {
     listenerRef.current = createRemoteChangeListener(targetDate, setRawLog);
   };
 
-  // TODO: 이걸 useLocalStorage로 뺄 수 있을까?
-  const goToDate = (dateProvider: DateProvider) => {
-    saveToStorage(currentDate, rawLog);
-
-    const targetDate = dateProvider(currentDate);
-    const targetLog = loadFromStorage(targetDate);
-    setCurrentDate(targetDate);
+  const handleDateChange = () => {
+    if (prevDate) {
+      // 첫 로딩일 경우 null
+      saveToStorage(prevDate, rawLog);
+    }
+    const targetLog = loadFromStorage(currentDate);
     setRawLog(targetLog);
     onLogUpdate(targetLog);
     focusInput();
-    changeRemoteListenerForNewDate(targetDate);
+    changeRemoteListenerForNewDate(currentDate);
   };
-
-  const goToToday = () => goToDate(getTodayString);
-  const goToPrevDate = () => goToDate(getDateStringDayBefore);
-  const goToNextDate = () => goToDate(getDateStringDayAfter);
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const nextRawLog = e.target.value;
@@ -99,6 +92,13 @@ export const TextLogContainer = ({ onLogUpdate }: TextLogContainerProps) => {
     focusInput();
     onLogUpdate(rawLog);
   }, []);
+
+  // handleDateChange를 하지 말고, 여기서 return을 해서 cleanup을 하도록 하면 prevDate 만들 필요 없음.
+  // https://legacy.reactjs.org/docs/hooks-faq.html#how-to-get-the-previous-props-or-state
+  useEffect(() => {
+    handleDateChange();
+    prevDateRef.current = currentDate; // 이전 날짜를 저장
+  }, [currentDate]);
 
   return (
     <div
@@ -116,18 +116,9 @@ export const TextLogContainer = ({ onLogUpdate }: TextLogContainerProps) => {
         }}
       >
         <h1>[기록지] ({currentDate})</h1>
-        <div>
-          <button onClick={goToPrevDate}>
-            <span style={{ fontSize: 32 }}>←</span>
-          </button>
-          <button onClick={goToToday}>
-            <span style={{ fontSize: 28 }}>오늘</span>
-          </button>
-          <button onClick={goToNextDate}>
-            <span style={{ fontSize: 32 }}>→</span>
-          </button>
-        </div>
+        <DayNavigator />
       </div>
+
       <textarea
         style={{
           width: '100%',
