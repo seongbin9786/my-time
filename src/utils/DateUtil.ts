@@ -53,7 +53,9 @@ export const minutesOf = (timeStr: string) => {
 };
 
 /**
- * string으로된 두 날짜의 간격을 분 단위로 변환한다.
+ * string으로된 두 시각의 간격을 분 단위로 변환한다.
+ *
+ * TODO: hh:mm 단위의 validation을 넣어서 잘못된 사용을 막아야 할 듯(내가 당했음..!)
  *
  * @param startedAt startedAt
  * @param endedAt endedAt
@@ -61,14 +63,3 @@ export const minutesOf = (timeStr: string) => {
  */
 export const diffBetweenTimeStrings = (startedAt: string, endedAt: string) =>
   timeStringToMinutes(endedAt) - timeStringToMinutes(startedAt);
-
-/**
- * string으로된 두 날짜의 간격이 하루 이상인지를 반환한다.
- *
- * @param dateStringA 날짜 1
- * @param dateStringB 날짜 2
- * @returns 하루 이상 차이나는지 여부
- */
-export const diffMoreThanOneDay = (dateStringA: string, dateStringB: string) =>
-  Math.abs(diffBetweenTimeStrings(dateStringB, dateStringA)) >=
-  HOURS_OF_24_IN_MINUTES;

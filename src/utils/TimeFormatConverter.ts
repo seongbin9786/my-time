@@ -1,4 +1,4 @@
-import { append0, diffMoreThanOneDay, timeStringToMinutes } from './DateUtil';
+import { append0 } from './DateUtil';
 import { extractTimeAndText } from './TimeRangeFormatter';
 
 /**
@@ -10,7 +10,7 @@ import { extractTimeAndText } from './TimeRangeFormatter';
  *
  * TODO: 해당 메소드 호출을 화면 revisit할 때마다 해야 함
  */
-const addCurrentTime = (str: string[], result: string[]) => {
+const addCurrentTime = (str: string[], result: string[], isDawn: boolean) => {
   const lastLog = str[str.length - 1];
   const [, startedAt, prevText] = extractTimeAndText(lastLog);
 
@@ -22,10 +22,7 @@ const addCurrentTime = (str: string[], result: string[]) => {
 
   const now = new Date();
   // 24시간이 넘으면 다음 날로 가기 때문에, 00:00으로 초기화되는데, 여기에 24시간을 더해줘야 한다.
-  const hours =
-    timeStringToMinutes(startedAt) >= 24 * 60
-      ? now.getHours() + 24
-      : now.getHours();
+  const hours = isDawn ? now.getHours() + 24 : now.getHours();
   const minutes = now.getMinutes();
   result.push(
     `[${startedAt} -> ${append0(hours)}:${append0(minutes)}] ${prevText}`
@@ -62,10 +59,12 @@ export const convertTimeFormat = (
     result.push(`[${startedAt} -> ${endedAt}] ${prevText}`);
   }
 
-  // 어제 이전 날짜는 해당되지 않음.
-  // 24시간 차이가 최대한 나도 어제 오전임.
-  if (!diffMoreThanOneDay(targetDay, today)) {
-    addCurrentTime(str, result);
+  const isDawn = targetDay !== today && new Date().getHours() < 7;
+  // addCurrentTime의 대상:
+  // 1. [오늘 내내]
+  // 2. [어제] 로그를 오늘 새벽에 안자고 기록하는 경우
+  if (targetDay === today || isDawn) {
+    addCurrentTime(str, result, isDawn);
   }
 
   return result.join('\n');
