@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 import { AvailableRestTimeChart } from './components/charts/AvailableRestTimeChart';
 import { ProductivePaceChart } from './components/charts/ProductivePaceChart';
 import { TextLogContainer } from './components/texts/TextLogContainer';
+import { TimeSummary } from './components/texts/TimeSummary';
 import { RootState } from './store';
 import { createLogsFromString } from './utils/LogConverter';
 import { avgPaceOf } from './utils/PaceUtil';
@@ -65,8 +66,11 @@ export const App = () => {
     >
       <TextLogContainer onLogUpdate={setRawLogs} />
       <Container>
-        <h1>[초과 휴식 시간]</h1>
-        <AvailableRestTimeChart logs={logsForCharts} />
+        <div style={{ height: '100%' }}>
+          <TimeSummary logs={logsForCharts} />
+          <h1>[초과 휴식 시간]</h1>
+          <AvailableRestTimeChart logs={logsForCharts} />
+        </div>
       </Container>
       <Container>
         <h1>[생산 페이스]</h1>
