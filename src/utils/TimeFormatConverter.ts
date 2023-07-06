@@ -1,4 +1,4 @@
-import { append0 } from './DateUtil';
+import { append0, diffBetweenTimeStrings } from './DateUtil';
 import { extractTimeAndText } from './TimeRangeFormatter';
 
 /**
@@ -59,12 +59,14 @@ export const convertTimeFormat = (
     result.push(`[${startedAt} -> ${endedAt}] ${prevText}`);
   }
 
-  const isDawn = targetDay !== today && new Date().getHours() < 7;
+  const yesterday = diffBetweenTimeStrings(targetDay, today) < 24 * 60;
+  const dawn = new Date().getHours() < 7;
   // addCurrentTime의 대상:
   // 1. [오늘 내내]
-  // 2. [어제] 로그를 오늘 새벽에 안자고 기록하는 경우
-  if (targetDay === today || isDawn) {
-    addCurrentTime(str, result, isDawn);
+  // 2. [어제] 로그를 오늘 새벽에 안자고 기록하는 경우 <---- 버그 발생 지점
+  // ---> isDawn을 최대 어제까지만 적용해야 함. (어제 이전의 날짜에 대해선 실행하면 안 됨.)
+  if (targetDay === today || (yesterday && dawn)) {
+    addCurrentTime(str, result, dawn);
   }
 
   return result.join('\n');
