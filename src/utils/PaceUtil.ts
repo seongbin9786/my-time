@@ -18,6 +18,11 @@ const UNIT = 10;
  */
 export const divideLogsIntoTimeUnit = (logs: Log[]): Log[] => {
   const result = [];
+  // 왜 이렇게 처리되는 거지?
+  // TODO: direction 설정을 다시 짜야 할 듯
+  if (logs[0].direction === '') {
+    logs[0].direction = logs[1].direction;
+  }
   result.push(logs[0]);
 
   for (let i = 1; i < logs.length; i++) {
@@ -43,7 +48,7 @@ export const divideLogsIntoTimeUnit = (logs: Log[]): Log[] => {
 
       result.push({
         offset: Math.floor(curLog.offset + UNIT * j),
-        direction: curLog.direction,
+        direction: nextLog.direction,
         productive: productiveDirection
           ? Math.floor(curLog.productive + (productiveDiff / numOfBlocks) * j)
           : curLog.productive,
