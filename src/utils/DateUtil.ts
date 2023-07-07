@@ -6,6 +6,21 @@ export const getDateString = (date: Date) => {
   )}`;
 };
 
+// TODO: validation하기
+export const justOneDayAwayAtMost = (
+  dateAString: string,
+  dateBString: string
+) => {
+  // getTime은 치트키지만...
+  const dateA = new Date(dateAString).getTime();
+  const dateB = new Date(dateBString).getTime();
+  const diffInMillis = Math.abs(dateA - dateB);
+
+  const startOfYesterday = HOURS_OF_24_IN_MS * 2;
+  const endOfYesterday = HOURS_OF_24_IN_MS;
+  return diffInMillis <= startOfYesterday && diffInMillis >= endOfYesterday;
+};
+
 export const getTodayString = () => getDateString(new Date());
 
 export const HOURS_OF_24_IN_MS = 24 * 60 * 60 * 1000;
@@ -26,6 +41,12 @@ export const getDateStringDayAfter = (date: string) =>
  */
 export const timeStringToMinutes = (timeStr: string) => {
   const [hStr, mStr] = timeStr.split(':');
+  // validation의 중요성...
+  if (!mStr) {
+    throw new Error(
+      `[timeStringToMinutes] timeStr은 hh:mm 형식이어야 합니다. 입력: [${timeStr}]`
+    );
+  }
   return Number(hStr) * 60 + Number(mStr);
 };
 
