@@ -101,30 +101,16 @@ export const TextLogContainer = ({ onLogUpdate }: TextLogContainerProps) => {
   }, [currentDate]);
 
   return (
-    <div
-      style={{
-        width: '100%',
-        height: '45vh',
-        gridColumn: '1 / span 2',
-      }}
-    >
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        }}
-      >
-        <h1>[기록지] ({currentDate})</h1>
+    <div className="flex flex-col w-full col-span-2 gap-4 sm:h-full h-1/2">
+      <div className="flex items-center justify-between">
+        <h1 className="text-xs font-bold sm:text-sm">
+          [기록지] ({currentDate})
+        </h1>
         <DayNavigator />
       </div>
 
       <textarea
-        style={{
-          width: '100%',
-          height: '85%',
-          fontSize: 16,
-        }}
+        className="w-full h-full mb-2 text-xs textarea textarea-bordered textarea-lg"
         value={rawLog}
         ref={inputRef}
         onChange={handleChange}

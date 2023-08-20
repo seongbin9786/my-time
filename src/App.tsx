@@ -21,13 +21,7 @@ const removeOnWindowFocusHandler = (handler: () => void) => {
 };
 
 const Container = (props: PropsWithChildren) => (
-  <div
-    style={{
-      height: '45vh',
-    }}
-  >
-    {props.children}
-  </div>
+  <div className="flex flex-col gap-2 h-1/2 sm:h-full">{props.children}</div>
 );
 
 const TARGET_PACE = 'targetPace';
@@ -57,35 +51,37 @@ export const App = () => {
   }, []);
 
   return (
-    <div
-      style={{
-        display: 'grid',
-        width: '95vw',
-        height: '95vh',
-        gridTemplateColumns: '1fr 1fr',
-        gridTemplateRows: '1fr 1fr',
-      }}
-    >
+    <div className="min-w-[400px] h-screen max-w-screen-xl grid-cols-2 grid-rows-2 p-4 mx-auto my-0 sm:grid">
       <TextLogContainer onLogUpdate={setRawLogs} />
       <Container>
-        <div style={{ height: '100%' }}>
-          <TimeSummary logs={logsForCharts} />
-          <h1>[초과 휴식 시간]</h1>
-          <AvailableRestTimeChart logs={logsForCharts} />
+        <div className="flex flex-col h-full">
+          <div className="h-20">
+            <h1 className="text-sm font-bold">[초과 휴식 시간]</h1>
+            <TimeSummary logs={logsForCharts} />
+          </div>
+          <div className="h-full">
+            <AvailableRestTimeChart logs={logsForCharts} />
+          </div>
         </div>
       </Container>
       <Container>
-        <h1>[생산 페이스]</h1>
         <div>
-          <span>목표 페이스 설정: </span>
-          <input value={targetPace} onChange={updateTargetPace} />
+          <h1 className="text-sm font-bold">[생산 페이스]</h1>
+          <span className="text-xs">목표 페이스 설정: </span>
+          <input
+            className="input input-bordered input-xs"
+            value={targetPace}
+            onChange={updateTargetPace}
+          />
         </div>
-        <ProductivePaceChart
-          data={logsForCharts}
-          totalAvg={0}
-          targetPace={targetPace}
-          todayAvg={avgPaceOf(logsForCharts)}
-        />
+        <div className="h-full">
+          <ProductivePaceChart
+            data={logsForCharts}
+            totalAvg={0}
+            targetPace={targetPace}
+            todayAvg={avgPaceOf(logsForCharts)}
+          />
+        </div>
       </Container>
     </div>
   );

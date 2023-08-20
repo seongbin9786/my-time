@@ -21,16 +21,11 @@ export const TimeSummary = ({ logs }: TimeSummaryProps) => {
   const wastedRatio = hasAnyLogs ? 100 - _ratio : 0;
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-      }}
-    >
-      <span>
+    <div className="flex flex-col gap-1">
+      <span className="text-xs">
         생산 합계: {minutesToTimeString(productive)} ({productiveRatio}%)
       </span>
-      <span>
+      <span className="text-xs">
         소비 합계: {minutesToTimeString(wasted)} ({wastedRatio}%)
       </span>
     </div>

@@ -26,7 +26,7 @@ export const ProductivePaceChart = ({
   targetPace,
 }: ProductivePaceChartProps) => {
   return (
-    <ResponsiveContainer width="80%" height="70%">
+    <ResponsiveContainer>
       <AreaChart
         width={500}
         height={400}
@@ -42,25 +42,30 @@ export const ProductivePaceChart = ({
         <XAxis
           dataKey="offset"
           type="number"
+          tick={{ fontSize: 16 }}
           tickFormatter={minutesToTimeString}
           domain={[8 * 60, 27 * 60]}
         />
-        <YAxis domain={[0, 60]} allowDataOverflow={true} />
+        <YAxis
+          domain={[0, 60]}
+          allowDataOverflow={true}
+          tick={{ fontSize: 16 }}
+        />
         <Tooltip labelFormatter={minutesToTimeString} />
         <ReferenceLine
           y={targetPace}
           stroke="red"
-          label={`목표: ${targetPace}min/h`}
+          label={{ value: `목표: ${targetPace}min/h`, fontSize: 16 }}
         />
         <ReferenceLine
           y={totalAvg}
           stroke="blue"
-          label={`전체 평균(${totalAvg}min/h)`}
+          label={{ value: `전체 평균(${totalAvg}min/h)`, fontSize: 16 }}
         />
         <ReferenceLine
           y={todayAvg}
           stroke="green"
-          label={`오늘 평균(${todayAvg}min/h)`}
+          label={{ value: `오늘 평균(${todayAvg}min/h)`, fontSize: 16 }}
         />
         <Area
           type="monotone"

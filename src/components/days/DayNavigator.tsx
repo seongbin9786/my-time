@@ -13,15 +13,18 @@ export const DayNavigator = () => {
   const handleTomorrowButton = () => dispatch(goToNextDate());
 
   return (
-    <div>
-      <button onClick={handleYesterdayButton}>
-        <span style={{ fontSize: 32 }}>{PREV_DAY_BUTTON_TEXT}</span>
+    <div className="flex gap-1">
+      <button className="btn btn-xs sm:btn-sm" onClick={handleYesterdayButton}>
+        <span className="sm:text-lg">{PREV_DAY_BUTTON_TEXT}</span>
       </button>
-      <button onClick={handleTodayButton}>
-        <span style={{ fontSize: 28 }}>{TODAY_BUTTON_TEXT}</span>
+      <button
+        className="btn sm:btn-sm btn-xs btn-primary"
+        onClick={handleTodayButton}
+      >
+        <span className="sm:text-lg">{TODAY_BUTTON_TEXT}</span>
       </button>
-      <button onClick={handleTomorrowButton}>
-        <span style={{ fontSize: 32 }}>{NEXT_DAY_BUTTON_TEXT}</span>
+      <button className="btn sm:btn-sm btn-xs" onClick={handleTomorrowButton}>
+        <span className="sm:text-lg">{NEXT_DAY_BUTTON_TEXT}</span>
       </button>
     </div>
   );

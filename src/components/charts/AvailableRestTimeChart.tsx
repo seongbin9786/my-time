@@ -42,7 +42,7 @@ export const AvailableRestTimeChart = ({
   const off = gradientOffset();
 
   return (
-    <ResponsiveContainer width="80%" height="70%">
+    <ResponsiveContainer>
       <AreaChart
         width={500}
         height={400}
@@ -58,10 +58,11 @@ export const AvailableRestTimeChart = ({
         <XAxis
           dataKey="offset"
           type="number"
+          tick={{ fontSize: 16 }}
           tickFormatter={minutesToTimeString}
           domain={[8 * 60, 27 * 60]}
         />
-        <YAxis />
+        <YAxis tick={{ fontSize: 16 }} />
         <Tooltip labelFormatter={minutesToTimeString} />
         <defs>
           <linearGradient id="splitColor" x1="0" y1="0" x2="0" y2="1">
