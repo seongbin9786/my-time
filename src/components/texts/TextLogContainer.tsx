@@ -3,49 +3,20 @@ import { useSelector } from 'react-redux';
 
 import { RootState } from '../../store';
 import { loadFromStorage, saveToStorage } from '../../utils/Storage';
+import { StorageListener } from '../../utils/StorageListener';
 import { DayNavigator } from '../days/DayNavigator';
 
-/**
- * 다른 탭에서 발생한 storage 이벤트를 받아 실시간 최신 값으로 갱신
- */
-const createRemoteChangeListener = (
-  currentDate: string,
-  setRawLog: (log: string) => void
-) => {
-  const listener = (e: StorageEvent) => {
-    const { key, newValue } = e;
-    // 값 변경 case가 아닌 경우
-    if (!key || !newValue) {
-      return;
-    }
-    // 보고 있는 날짜일 때만 갱신
-    if (key === currentDate) {
-      setRawLog(newValue);
-    }
-  };
-  window.addEventListener('storage', listener);
-  console.log('added new listener at ', currentDate);
-
-  // 해당 리스너를 반환해야 삭제 가능
-  return listener;
-};
+const storageListener = new StorageListener();
 
 interface TextLogContainerProps {
   onLogUpdate: (result: string) => void;
 }
 
 export const TextLogContainer = ({ onLogUpdate }: TextLogContainerProps) => {
-  // useState, useRef의 초기값은 함수인 경우 최초 1회만 실행하고 평가가 반복되지 않음.
-  // 그 외의 경우는 평가는 하되 무시함. 매번 실행되는 이유는 인자이기 때문인 듯.
-  // 참고: https://legacy.reactjs.org/docs/hooks-reference.html#lazy-initial-state
-  const prevDateRef = useRef<string | null>(null);
-  const prevDate = prevDateRef.current;
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const currentDate = useSelector((state: RootState) => state.currentDate);
+  const [prevDate, setPrevDate] = useState<string | null>(null);
   const [rawLog, setRawLog] = useState(() => loadFromStorage(currentDate));
-  const listenerRef = useRef<(e: StorageEvent) => void>(() =>
-    createRemoteChangeListener(currentDate, setRawLog)
-  );
 
   const focusInput = () => {
     if (inputRef.current) {
@@ -62,12 +33,6 @@ export const TextLogContainer = ({ onLogUpdate }: TextLogContainerProps) => {
     }
   };
 
-  const changeRemoteListenerForNewDate = (targetDate: string) => {
-    console.log('removed old listener at ', targetDate);
-    window.removeEventListener('storage', listenerRef.current);
-    listenerRef.current = createRemoteChangeListener(targetDate, setRawLog);
-  };
-
   const handleDateChange = () => {
     if (prevDate) {
       // 첫 로딩일 경우 null
@@ -77,7 +42,6 @@ export const TextLogContainer = ({ onLogUpdate }: TextLogContainerProps) => {
     setRawLog(targetLog);
     onLogUpdate(targetLog);
     focusInput();
-    changeRemoteListenerForNewDate(currentDate);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -90,14 +54,20 @@ export const TextLogContainer = ({ onLogUpdate }: TextLogContainerProps) => {
   useEffect(() => {
     synchronizeInput();
     focusInput();
-    onLogUpdate(rawLog);
+    onLogUpdate(rawLog); // 전역 상태에 대해 이 컴포넌트에서 localstorage로부터 얻어온 데이터를 갱신하는 역할
+    // TODO: onLogUpdate를 제거하고 전역 상태로 놓는 게 깔끔할 듯? 당장 이 상태를 변경하는 건 이 컴포넌트 뿐이긴 함
   }, []);
 
   // handleDateChange를 하지 말고, 여기서 return을 해서 cleanup을 하도록 하면 prevDate 만들 필요 없음.
   // https://legacy.reactjs.org/docs/hooks-faq.html#how-to-get-the-previous-props-or-state
   useEffect(() => {
+    storageListener.install(currentDate, setRawLog);
     handleDateChange();
-    prevDateRef.current = currentDate; // 이전 날짜를 저장
+
+    setPrevDate(currentDate);
+    // 이전 날짜를 저장
+    // 첫 렌더링 시 이 useEffect를 호출함
+    // currentDate가 동일한데, handleDateChange 이후에 호출되어야 불필요한 saveToStorage가 없을 듯
   }, [currentDate]);
 
   return (
