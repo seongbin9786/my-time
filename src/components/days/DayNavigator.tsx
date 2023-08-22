@@ -1,6 +1,6 @@
 import { useDispatch } from 'react-redux';
 
-import { goToNextDate, goToPrevDate, goToToday } from '../../store/currentDate';
+import { goToNextDate, goToPrevDate, goToToday } from '../../store/logs';
 
 const PREV_DAY_BUTTON_TEXT = '←';
 const TODAY_BUTTON_TEXT = '오늘';

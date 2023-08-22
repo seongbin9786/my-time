@@ -1,11 +1,14 @@
 import { configureStore } from '@reduxjs/toolkit';
 
-import { currentDateReducer } from './currentDate';
+import { LogsReducer } from './logs';
+import { RawLogStorageSyncMiddleware } from './RawLogStorageSyncMiddleware';
 
 export const store = configureStore({
   reducer: {
-    currentDate: currentDateReducer,
+    logs: LogsReducer,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().prepend(RawLogStorageSyncMiddleware.middleware),
 });
 
 // Infer the `RootState` and `AppDispatch` types from the store itself
