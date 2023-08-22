@@ -83,6 +83,10 @@ export const createLogsFromString = (
   targetDay: string,
   today: string = getTodayString()
 ) => {
+  // 불필요한 예외 제거
+  if (rawLog.length === 0) {
+    return [];
+  }
   try {
     const formatted = convertTimeFormat(rawLog, targetDay, today);
     const accumulated = generateAccumulatedLog(formatted);
