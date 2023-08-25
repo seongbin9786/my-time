@@ -1,31 +1,9 @@
-import type { AnyAction, TypedStartListening } from '@reduxjs/toolkit';
+import type { TypedStartListening } from '@reduxjs/toolkit';
 import { createListenerMiddleware, isAnyOf } from '@reduxjs/toolkit';
 
-import {
-  getDateStringDayAfter,
-  getDateStringDayBefore,
-  getTodayString,
-} from '../utils/DateUtil';
 import { loadFromStorage, saveToStorage } from '../utils/Storage';
 import type { AppDispatch, RootState } from '.';
-import {
-  goToNextDate,
-  goToPrevDate,
-  goToToday,
-  LogSlice,
-  updateRawLog,
-} from './logs';
-
-const nextDateOfAction = (action: AnyAction, currentDate: string) => {
-  // match 코드 문서: https://github.com/reduxjs/redux-toolkit/issues/237#issuecomment-578057024
-  if (LogSlice.actions.goToPrevDate.match(action)) {
-    return getDateStringDayBefore(currentDate);
-  }
-  if (LogSlice.actions.goToNextDate.match(action)) {
-    return getDateStringDayAfter(currentDate);
-  }
-  return getTodayString();
-};
+import { goToNextDate, goToPrevDate, goToToday, updateRawLog } from './logs';
 
 /**
  * RawLog를 Storage에 저장하고 불러오는 Middleware
@@ -53,11 +31,19 @@ startAppListening({
 // localstorage에서 불러오기
 startAppListening({
   matcher: isAnyOf(goToToday, goToPrevDate, goToNextDate),
-  effect: (action, middleareAPI) => {
-    const { currentDate } = middleareAPI.getState().logs;
-    const nextDate: string = nextDateOfAction(action, currentDate);
-    const RawLogForNextDate = loadFromStorage(nextDate);
-    middleareAPI.dispatch(updateRawLog(RawLogForNextDate));
-    console.log(`[middleware] loaded, dispatched update at ${nextDate}`);
+  // 이게 언제 실행 되는 거야?
+  effect: (_, middleareAPI) => {
+    const { currentDate: changedDate } = middleareAPI.getState().logs;
+    /*
+    bug fix:
+      이전 날짜로 가면, 하루 더 전 날짜로 이동함
+      다음 날짜로 가면, 하루 더 후 날짜로 이동함
+      원인: effect가 실행되는 때에는 이미 state가 반영된 후인 듯
+
+      따라서 추가로 getNextDate(currentDate); 하는 경우 잘못된 날짜의 데이터로 덮어씌어진다.
+    */
+    const RawLogForChangedDate = loadFromStorage(changedDate);
+    middleareAPI.dispatch(updateRawLog(RawLogForChangedDate));
+    console.log(`[middleware] loaded, dispatched update at ${changedDate}`);
   },
 });
