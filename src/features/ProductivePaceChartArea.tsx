@@ -1,15 +1,14 @@
 import { ChangeEvent, useState } from 'react';
 
 import { ProductivePaceChart } from '../components/charts/ProductivePaceChart';
+import { DEFAULT_PACE_IN_MIN } from '../policies/userConfig';
 import { avgPaceOf, Log } from '../utils/PaceUtil';
 import { loadFromStorage, saveToStorage } from '../utils/Storage';
-
-// 유틸 함수
-const intOrZero = (x: string) => Number.parseInt(x) ?? 0;
+import { parseOrDefault } from '../utils/StringUtil';
 
 const STORAGE_KEY_TARGET_PACE = 'targetPace';
 const storedTargetPace = loadFromStorage(STORAGE_KEY_TARGET_PACE);
-const initialTargetPace = intOrZero(storedTargetPace); // 최초 방문 시 값이 아예 없는 경우.
+const initialTargetPace = parseOrDefault(storedTargetPace, DEFAULT_PACE_IN_MIN);
 
 /**
  * ProductivePace 차트 + 입력 폼을 포함한 영역
@@ -22,7 +21,7 @@ export const Area_ProductivePaceChart = ({
   const [targetPace, setTargetPace] = useState(initialTargetPace);
 
   const updateTargetPace = (e: ChangeEvent<HTMLInputElement>) => {
-    const nextPace = intOrZero(e.target.value);
+    const nextPace = Number.parseInt(e.target.value, 10);
     setTargetPace(nextPace);
     saveToStorage(STORAGE_KEY_TARGET_PACE, nextPace + '');
   };
