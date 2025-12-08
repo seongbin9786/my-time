@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { RootState } from '../../store';
@@ -10,6 +10,9 @@ const storageListener = new StorageListener();
 
 export const TextLogContainer = () => {
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const quickInputRef = useRef<HTMLInputElement>(null);
+  const [quickInput, setQuickInput] = useState('');
+  const [isProductive, setIsProductive] = useState(true);
 
   const { currentDate, rawLogs } = useSelector(
     (state: RootState) => state.logs
@@ -38,6 +41,28 @@ export const TextLogContainer = () => {
     setRawLogs(nextRawLog);
   };
 
+  const handleQuickInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setQuickInput(e.target.value);
+  };
+
+  const handleQuickInputSubmit = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && quickInput.trim()) {
+      const now = new Date();
+      const hours = now.getHours();
+      const minutes = now.getMinutes();
+      const timeStr = `${hours.toString().padStart(2, '0')}:${minutes
+        .toString()
+        .padStart(2, '0')}`;
+
+      const plusMinus = isProductive ? '+' : '-';
+      const newLog = `[${timeStr}] ${plusMinus} ${quickInput.trim()}`;
+      const updatedLogs = rawLogs ? `${rawLogs}\n${newLog}` : newLog;
+
+      setRawLogs(updatedLogs);
+      setQuickInput('');
+    }
+  };
+
   useEffect(() => {
     synchronizeInput();
     focusInput();
@@ -57,6 +82,27 @@ export const TextLogContainer = () => {
           [기록지] ({currentDate})
         </h1>
         <DayNavigator />
+      </div>
+
+      <div className="flex items-center gap-2">
+        <label className="flex items-center gap-2 cursor-pointer">
+          <input
+            type="checkbox"
+            className="checkbox checkbox-sm"
+            checked={isProductive}
+            onChange={(e) => setIsProductive(e.target.checked)}
+          />
+          <span className="text-xs">{isProductive ? '+' : '-'}</span>
+        </label>
+        <input
+          type="text"
+          className="flex-1 text-xs input input-bordered"
+          placeholder="활동 내용 입력 후 엔터"
+          value={quickInput}
+          ref={quickInputRef}
+          onChange={handleQuickInputChange}
+          onKeyDown={handleQuickInputSubmit}
+        />
       </div>
 
       <textarea
