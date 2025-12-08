@@ -9,8 +9,8 @@ import { DayNavigator } from '../days/DayNavigator';
 const storageListener = new StorageListener();
 
 export const TextLogContainer = () => {
+  const checkboxRef = useRef<HTMLInputElement>(null); // NOTE: +/- 여부를 스페이스바로 쉽게 토글하고, 탭으로 곧장 quick input으로 이동 가능하므로, checkbox에 focus 둠.
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  const quickInputRef = useRef<HTMLInputElement>(null);
   const [quickInput, setQuickInput] = useState('');
   const [isProductive, setIsProductive] = useState(true);
 
@@ -19,12 +19,6 @@ export const TextLogContainer = () => {
   );
   const dispatch = useDispatch();
   const setRawLogs = (nextRawLog: string) => dispatch(updateRawLog(nextRawLog));
-
-  const focusInput = () => {
-    if (inputRef.current) {
-      inputRef.current.focus();
-    }
-  };
 
   // TODO: 이게 무슨 동작인지 확인하기
   // 최근에 닫았던 탭을 다시 살리는 경우, input value가 채워진 상태로 켜짐.
@@ -60,19 +54,21 @@ export const TextLogContainer = () => {
 
       setRawLogs(updatedLogs);
       setQuickInput('');
+
+      checkboxRef.current?.focus();
     }
   };
 
   useEffect(() => {
     synchronizeInput();
-    focusInput();
+    checkboxRef.current?.focus();
   }, []);
 
   // handleDateChange를 하지 말고, 여기서 return을 해서 cleanup을 하도록 하면 prevDate 만들 필요 없음.
   // https://legacy.reactjs.org/docs/hooks-faq.html#how-to-get-the-previous-props-or-state
   useEffect(() => {
     storageListener.install(currentDate, setRawLogs);
-    focusInput();
+    checkboxRef.current?.focus();
   }, [currentDate]);
 
   return (
@@ -91,6 +87,7 @@ export const TextLogContainer = () => {
             className="checkbox checkbox-sm"
             checked={isProductive}
             onChange={(e) => setIsProductive(e.target.checked)}
+            ref={checkboxRef}
           />
           <span className="text-xs">{isProductive ? '+' : '-'}</span>
         </label>
@@ -99,7 +96,6 @@ export const TextLogContainer = () => {
           className="flex-1 text-xs input input-bordered"
           placeholder="활동 내용 입력 후 엔터"
           value={quickInput}
-          ref={quickInputRef}
           onChange={handleQuickInputChange}
           onKeyDown={handleQuickInputSubmit}
         />
