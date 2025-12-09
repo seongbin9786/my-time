@@ -26,10 +26,8 @@ export const ProductivePaceChart = ({
   targetPace,
 }: ProductivePaceChartProps) => {
   return (
-    <ResponsiveContainer>
+    <ResponsiveContainer className='min-h-0'>
       <AreaChart
-        width={500}
-        height={400}
         data={data}
         margin={{
           top: 10,
@@ -60,7 +58,10 @@ export const ProductivePaceChart = ({
         <ReferenceLine
           y={totalAvg}
           stroke="blue"
-          label={{ value: `전체 평균(${totalAvg}min/h)`, fontSize: 16 }}
+          label={{
+            value: `[미지원] 전체 평균(${totalAvg}min/h)`,
+            fontSize: 16,
+          }}
         />
         <ReferenceLine
           y={todayAvg}

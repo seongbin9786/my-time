@@ -27,8 +27,7 @@ export const Area_ProductivePaceChart = ({
   };
 
   return (
-    // h-full은 flex 구역 크기 설정 때문에 존재
-    <div className="flex flex-col gap-2 h-1/2 sm:h-full">
+    <div className="flex flex-col gap-2">
       <div>
         <h1 className="text-sm font-bold">[생산 페이스]</h1>
         <span className="text-xs">목표 페이스 설정: </span>
@@ -38,14 +37,12 @@ export const Area_ProductivePaceChart = ({
           onChange={updateTargetPace}
         />
       </div>
-      <div className="h-full">
-        <ProductivePaceChart
-          data={logsForCharts}
-          totalAvg={0}
-          targetPace={targetPace}
-          todayAvg={avgPaceOf(logsForCharts)}
-        />
-      </div>
+      <ProductivePaceChart
+        data={logsForCharts}
+        totalAvg={0}
+        targetPace={targetPace}
+        todayAvg={avgPaceOf(logsForCharts)}
+      />
     </div>
   );
 };
