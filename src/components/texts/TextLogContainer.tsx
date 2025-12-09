@@ -4,7 +4,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import { updateRawLog } from '../../store/logs';
 import { StorageListener } from '../../utils/StorageListener';
-import { DayNavigator } from '../days/DayNavigator';
 
 const storageListener = new StorageListener();
 
@@ -72,14 +71,7 @@ export const TextLogContainer = () => {
   }, [currentDate]);
 
   return (
-    <div className="flex flex-col w-full col-span-2 gap-4 sm:h-full h-1/2">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xs font-bold sm:text-sm">
-          [기록지] ({currentDate})
-        </h1>
-        <DayNavigator />
-      </div>
-
+    <div className="flex flex-col gap-4">
       <div className="flex items-center gap-2">
         <label className="flex items-center gap-2 cursor-pointer">
           <input
@@ -102,7 +94,7 @@ export const TextLogContainer = () => {
       </div>
 
       <textarea
-        className="w-full h-full mb-2 text-xs textarea textarea-bordered textarea-lg"
+        className="flex-1 mb-2 text-xs textarea textarea-bordered textarea-lg aspect-square"
         value={rawLogs}
         ref={inputRef}
         onChange={handleChange}

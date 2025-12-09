@@ -1,5 +1,6 @@
 import { useSelector } from 'react-redux';
 
+import { DayNavigator } from '../components/days/DayNavigator';
 import { TextLogContainer } from '../components/texts/TextLogContainer';
 import { Area_AvailableRestTimeChart } from '../features/AvailableRestTimeChartArea';
 import { Area_ProductivePaceChart } from '../features/ProductivePaceChartArea';
@@ -7,15 +8,27 @@ import { RootState } from '../store';
 
 export const LogWriterPage = () => {
   // 바로 다음 컴포넌트이니 직접 주입, redux 의존성 낮추기 위함.
-  const logsForCharts = useSelector(
+  const logsForCharts = useSelector(  
     (state: RootState) => state.logs.logsForCharts
   );
 
+  const { currentDate } = useSelector((state: RootState) => state.logs);
+
   return (
-    <div className="min-w-[400px] h-screen max-w-screen-xl grid-cols-2 grid-rows-2 p-4 mx-auto my-0 sm:grid">
-      <TextLogContainer />
-      <Area_AvailableRestTimeChart logsForCharts={logsForCharts} />
-      <Area_ProductivePaceChart logsForCharts={logsForCharts} />
+    <div className="flex flex-col p-4 h-screen min-w-[400px] max-w-screen-xl mx-auto">
+      <div className="flex items-center justify-between">
+        <h1 className="text-xs font-bold sm:text-sm">
+          [기록지] ({currentDate})
+        </h1>
+        <DayNavigator />
+      </div>
+      {/* NOTE: 정말 이유는 모르겠지만, overflow-y-auto 설정을 넣으면  */}
+      <div className="flex-1 sm:grid-cols-2 sm:grid-rows-2 p-4 my-0 grid grid-cols-1 grid-rows-4 min-h-0">
+        <TextLogContainer />
+        <div>hello</div>
+        <Area_AvailableRestTimeChart logsForCharts={logsForCharts} />
+        <Area_ProductivePaceChart logsForCharts={logsForCharts} />
+      </div>
     </div>
   );
 };
