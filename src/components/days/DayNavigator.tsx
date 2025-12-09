@@ -18,12 +18,12 @@ export const DayNavigator = () => {
         <span className="sm:text-lg">{PREV_DAY_BUTTON_TEXT}</span>
       </button>
       <button
-        className="btn sm:btn-sm btn-xs btn-primary"
+        className="btn btn-primary btn-xs sm:btn-sm"
         onClick={handleTodayButton}
       >
         <span className="sm:text-lg">{TODAY_BUTTON_TEXT}</span>
       </button>
-      <button className="btn sm:btn-sm btn-xs" onClick={handleTomorrowButton}>
+      <button className="btn btn-xs sm:btn-sm" onClick={handleTomorrowButton}>
         <span className="sm:text-lg">{NEXT_DAY_BUTTON_TEXT}</span>
       </button>
     </div>

@@ -14,7 +14,7 @@ export const TextLogContainer = () => {
   const [isProductive, setIsProductive] = useState(true);
 
   const { currentDate, rawLogs } = useSelector(
-    (state: RootState) => state.logs
+    (state: RootState) => state.logs,
   );
   const dispatch = useDispatch();
   const setRawLogs = (nextRawLog: string) => dispatch(updateRawLog(nextRawLog));
@@ -73,7 +73,7 @@ export const TextLogContainer = () => {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center gap-2">
-        <label className="flex items-center gap-2 cursor-pointer">
+        <label className="flex cursor-pointer items-center gap-2">
           <input
             type="checkbox"
             className="checkbox checkbox-sm"
@@ -85,7 +85,7 @@ export const TextLogContainer = () => {
         </label>
         <input
           type="text"
-          className="flex-1 text-xs input input-bordered"
+          className="input input-bordered flex-1 text-xs"
           placeholder="활동 내용 입력 후 엔터"
           value={quickInput}
           onChange={handleQuickInputChange}
@@ -94,7 +94,7 @@ export const TextLogContainer = () => {
       </div>
 
       <textarea
-        className="flex-1 mb-2 text-xs textarea textarea-bordered textarea-lg aspect-square"
+        className="textarea textarea-bordered textarea-lg mb-2 aspect-square flex-1 text-xs"
         value={rawLogs}
         ref={inputRef}
         onChange={handleChange}

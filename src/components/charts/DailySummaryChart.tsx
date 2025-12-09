@@ -18,10 +18,10 @@ const data = getSummary();
 
 const gradientOffset = () => {
   const dataMax = Math.max(
-    ...data.map((d) => d.productiveMinutes - d.wastedMinutes)
+    ...data.map((d) => d.productiveMinutes - d.wastedMinutes),
   );
   const dataMin = Math.min(
-    ...data.map((d) => d.productiveMinutes - d.wastedMinutes)
+    ...data.map((d) => d.productiveMinutes - d.wastedMinutes),
   );
 
   if (dataMax <= 0) {

@@ -2,14 +2,14 @@ export const append0 = (num: number) => (num <= 9 ? `0${num}` : num + '');
 
 export const getDateString = (date: Date) => {
   return `${date.getFullYear()}-${append0(date.getMonth() + 1)}-${append0(
-    date.getDate()
+    date.getDate(),
   )}`;
 };
 
 // TODO: validation하기
 export const justOneDayAwayAtMost = (
   dateAString: string,
-  dateBString: string
+  dateBString: string,
 ) => {
   // getTime은 치트키지만...
   const dateA = new Date(dateAString).getTime();
@@ -44,7 +44,7 @@ export const timeStringToMinutes = (timeStr: string) => {
   // validation의 중요성...
   if (!mStr) {
     throw new Error(
-      `[timeStringToMinutes] timeStr은 hh:mm 형식이어야 합니다. 입력: [${timeStr}]`
+      `[timeStringToMinutes] timeStr은 hh:mm 형식이어야 합니다. 입력: [${timeStr}]`,
     );
   }
   return Number(hStr) * 60 + Number(mStr);

@@ -35,7 +35,7 @@ export const FlowStatusChart = ({ data, ratio }: FlowStatusChartProps) => {
     ratio;
 
   return (
-    <div className="w-full h-full">
+    <div className="h-full w-full">
       <div style={{ display: 'flex', gap: 4 }}>
         <span style={{ color: 'blue' }}>
           포기: {totalSurrender} (상위 {totalSurrenderRatio}%)

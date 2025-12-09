@@ -25,7 +25,7 @@ const addCurrentTime = (str: string[], result: string[], isDawn: boolean) => {
   const hours = isDawn ? now.getHours() + 24 : now.getHours();
   const minutes = now.getMinutes();
   result.push(
-    `[${startedAt} -> ${append0(hours)}:${append0(minutes)}] ${prevText}`
+    `[${startedAt} -> ${append0(hours)}:${append0(minutes)}] ${prevText}`,
   );
 };
 
@@ -36,7 +36,7 @@ const addCurrentTime = (str: string[], result: string[], isDawn: boolean) => {
 export const convertTimeFormat = (
   rawLogs: string,
   targetDay: string,
-  today: string
+  today: string,
 ) => {
   const str = rawLogs.trim().split('\n');
 

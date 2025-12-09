@@ -42,7 +42,7 @@ export const AvailableRestTimeChart = ({
   const off = gradientOffset();
 
   return (
-    <ResponsiveContainer className='min-h-0'>
+    <ResponsiveContainer className="min-h-0">
       <AreaChart
         data={data}
         margin={{

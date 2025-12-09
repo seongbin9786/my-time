@@ -81,7 +81,7 @@ const generateAccumulatedLog = (rawLogs: string): Log[] => {
 export const createLogsFromString = (
   rawLog: string,
   targetDay: string,
-  today: string = getTodayString()
+  today: string = getTodayString(),
 ) => {
   // 불필요한 예외 제거
   if (rawLog.length === 0) {
