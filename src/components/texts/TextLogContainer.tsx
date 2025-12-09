@@ -39,7 +39,8 @@ export const TextLogContainer = () => {
   };
 
   const handleQuickInputSubmit = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && quickInput.trim()) {
+    // NOTE: Enter 입력 시 마지막 글자도 함께 입력됨
+    if (e.key === 'Enter' && !e.nativeEvent.isComposing && quickInput.trim()) {
       const now = new Date();
       const hours = now.getHours();
       const minutes = now.getMinutes();
