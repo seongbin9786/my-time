@@ -246,6 +246,7 @@ interface BulkLogInput {
   content: string;
   contentHash: string;
   parentHash: string | null;
+  source?: 'edit' | 'restore' | 'import';
 }
 
 /**
@@ -278,6 +279,9 @@ export const importBackup = async (file: File): Promise<ImportBackupReport> => {
           )
           .sort(([a], [b]) => a.localeCompare(b));
         const emptyLogs = logEntries.filter(([, value]) => !value);
+        const logsToApply = logEntries.filter(([, value]) =>
+          hasLogContent(value),
+        );
 
         // 1. 기존 로그 데이터 삭제 (For both sync and local modes, to ensure clean state)
         // 기존 HEAD는 selective update였지만, main은 clean & replace 방식이었음.
@@ -293,12 +297,13 @@ export const importBackup = async (file: File): Promise<ImportBackupReport> => {
           );
 
           // 2. Bulk API로 모든 로그를 한 번에 업로드
-          const bulkLogs: BulkLogInput[] = logEntries.map(
+          const bulkLogs: BulkLogInput[] = logsToApply.map(
             ([date, logContent]) => ({
               date,
               content: logContent,
               contentHash: calculateHashSync(logContent),
               parentHash: null, // 새로운 체인 시작
+              source: 'import',
             }),
           );
 
@@ -307,23 +312,32 @@ export const importBackup = async (file: File): Promise<ImportBackupReport> => {
           // 3. 서버 응답으로 localStorage 저장
           if (result?.success && result.data) {
             const serverDataMap = new Map(
-              result.data.map((item: { date: string; contentHash: string }) => [
-                item.date,
-                item.contentHash,
-              ]),
+              result.data.map(
+                (item: {
+                  date: string;
+                  contentHash: string;
+                  parentHash: string | null;
+                  promoted?: boolean;
+                }) => [item.date, item],
+              ),
             );
 
-            logEntries.forEach(([date, logContent]) => {
-              const serverHash = serverDataMap.get(date);
-              if (serverHash) {
-                saveToStorage(date, logContent, { parentHash: serverHash });
+            logsToApply.forEach(([date, logContent]) => {
+              const serverData = serverDataMap.get(date);
+              if (serverData) {
+                saveToStorage(date, logContent, {
+                  parentHash:
+                    serverData.promoted === false
+                      ? (serverData.parentHash ?? null)
+                      : serverData.contentHash,
+                });
               } else {
                 saveToStorage(date, logContent);
               }
             });
           } else {
             // 서버 저장 실패 시 로컬에만 저장
-            logEntries.forEach(([date, logContent]) => {
+            logsToApply.forEach(([date, logContent]) => {
               saveToStorage(date, logContent);
             });
           }
@@ -331,7 +345,7 @@ export const importBackup = async (file: File): Promise<ImportBackupReport> => {
           // 비로그인 상태: 로컬 저장만
           console.log('[importBackup] Not logged in - saving to local only');
 
-          logEntries.forEach(([date, logContent]) => {
+          logsToApply.forEach(([date, logContent]) => {
             saveToStorage(date, logContent);
           });
         }
@@ -346,14 +360,12 @@ export const importBackup = async (file: File): Promise<ImportBackupReport> => {
         });
 
         const failedLogs: string[] = [];
-        logEntries
-          .filter(([, value]) => value)
-          .forEach(([key, value]) => {
-            const stored = localStorage.getItem(key);
-            if (!matchesStoredContent(stored, String(value))) {
-              failedLogs.push(key);
-            }
-          });
+        logsToApply.forEach(([key, value]) => {
+          const stored = localStorage.getItem(key);
+          if (!matchesStoredContent(stored, String(value))) {
+            failedLogs.push(key);
+          }
+        });
 
         const report: ImportBackupReport = {
           fileName: file.name,

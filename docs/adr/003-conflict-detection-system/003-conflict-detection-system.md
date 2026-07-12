@@ -1,5 +1,7 @@
 # 충돌 탐지 시스템: Linked List of Hashes
 
+> 상태: 부분 대체. 해시 기반 parent 추적 아이디어는 기존 클라이언트 호환 계층으로 유지하지만, 2026-06-21 기준 서버의 최종 보존 모델은 ADR 004의 append-only revision + current pointer입니다.
+
 ## 핵심 결정: Git 방식의 버전 체인 추적
 
 `my-commit` 프로젝트는 로컬과 서버 간의 데이터 동기화에서 발생하는 충돌을 정확하게 감지하고 해결하기 위해, 단순한 타임스탬프 비교 대신 Git과 유사한 Linked List of Hashes 방식을 채택했습니다.

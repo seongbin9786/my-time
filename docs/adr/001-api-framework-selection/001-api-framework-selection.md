@@ -1,5 +1,7 @@
 # API 프레임워크 선택: Hono
 
+> 상태: Superseded. 2026-06-21 기준 AWS Lambda + DynamoDB + Serverless Framework 선택은 더 이상 현재 아키텍처가 아닙니다. 현재 결정은 ADR 004의 NestJS + host MySQL + local Docker self-host 구조입니다.
+
 ## 핵심 결정 요인: 서비스 비용 최소화
 
 개인 프로젝트 `my-commit`은 트래픽이 적은 서비스입니다.

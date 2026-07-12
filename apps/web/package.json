@@ -10,9 +10,7 @@
     "build": "tsc && vite build",
     "lint": "eslint . --max-warnings 0",
     "lint:fix": "eslint . --max-warnings 0 --fix",
-    "preview": "vite preview",
-    "deploy": "if [ \"${MY_COMMIT_ROOT_DEPLOY:-}\" != \"1\" ]; then echo \"Use repository-root deploy command: pnpm run deploy:prod or pnpm run deploy:dev\"; exit 1; fi; pnpm build && serverless deploy",
-    "remove": "serverless remove"
+    "preview": "vite preview"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.11.2",
@@ -42,9 +40,6 @@
     "postcss": "^8.4.28",
     "prettier": "^3.7.4",
     "prettier-plugin-tailwindcss": "^0.7.2",
-    "serverless": "^3.38.0",
-    "serverless-cloudfront-invalidate": "^1.12.0",
-    "serverless-s3-sync": "^3.2.0",
     "tailwindcss": "^3.3.3",
     "typescript": "^5.0.2",
     "vite": "^4.3.2",

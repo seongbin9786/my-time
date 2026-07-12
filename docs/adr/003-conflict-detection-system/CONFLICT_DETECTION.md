@@ -1,5 +1,7 @@
 # 충돌 탐지 시스템 (Conflict Detection System)
 
+> 상태: 부분 대체. 해시 기반 parent 추적 아이디어는 기존 클라이언트 호환 계층으로 유지하지만, 2026-06-21 기준 서버 저장소는 DynamoDB가 아니라 MySQL 기반 append-only revision + current pointer입니다.
+
 ## 개요
 
 본 시스템은 Git과 유사한 Linked List of Hashes 방식을 사용하여 로컬과 서버 간의 데이터 동기화 충돌을 감지합니다. 단순한 타임스탬프 비교가 아닌, 버전 체인을 추적하여 정확한 충돌 판단을 수행합니다.
@@ -248,17 +250,19 @@ interface LocalLogData {
 }
 ```
 
-### 서버 DB (DynamoDB)
+### 서버 DB (현재 MySQL)
 
 ```typescript
-interface LogItem {
-  userId: string; // Partition Key
-  date: string; // Sort Key
+interface LogRevision {
+  userId: string;
+  date: string;
+  revisionId: string;
   content: string;
   contentHash: string;
-  parentHash: string | null;
-  updatedAt: string;
-  version: number;
+  baseContentHash: string | null;
+  baseRevisionId: string | null;
+  promoted: boolean;
+  createdAt: string;
 }
 ```
 

@@ -12,7 +12,11 @@ export interface ServerLogResponse {
     parentHash: string | null;
     updatedAt: string;
     version: number;
+    promoted?: boolean;
+    reason?: 'STALE_BASE';
   };
+  promoted?: boolean;
+  reason?: 'STALE_BASE';
 }
 
 export interface BackupItem {
@@ -208,6 +212,7 @@ export async function bulkSaveLogsToServer(
     content: string;
     contentHash: string;
     parentHash: string | null;
+    source?: 'edit' | 'restore' | 'import';
   }[],
 ): Promise<{
   success: boolean;

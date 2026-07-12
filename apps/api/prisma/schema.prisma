@@ -1,0 +1,70 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  username     String        @id @db.VarChar(191)
+  passwordHash String        @map("password_hash") @db.VarChar(255)
+  createdAt    DateTime      @default(now()) @map("created_at") @db.DateTime(3)
+  updatedAt    DateTime      @updatedAt @map("updated_at") @db.DateTime(3)
+  settings     UserSettings?
+  revisions    LogRevision[]
+  currentLogs  CurrentLog[]
+
+  @@map("users")
+}
+
+model UserSettings {
+  username         String   @id @db.VarChar(191)
+  appTheme         String?  @map("app_theme") @db.VarChar(191)
+  appThemeByScheme String?  @map("app_theme_by_scheme") @db.Text
+  updatedAt        DateTime @updatedAt @map("updated_at") @db.DateTime(3)
+  user             User     @relation(fields: [username], references: [username], onDelete: Cascade)
+
+  @@map("user_settings")
+}
+
+model LogRevision {
+  revisionId       String         @id @default(uuid()) @map("revision_id") @db.Char(36)
+  userId           String         @map("user_id") @db.VarChar(191)
+  logDate          String         @map("log_date") @db.Char(10)
+  content          String         @db.LongText
+  contentHash      String         @map("content_hash") @db.VarChar(128)
+  baseRevisionId   String?        @map("base_revision_id") @db.Char(36)
+  baseContentHash  String?        @map("base_content_hash") @db.VarChar(128)
+  source           RevisionSource @default(edit)
+  promoted         Boolean        @default(false)
+  clientMutationId String?        @map("client_mutation_id") @db.VarChar(191)
+  createdAt        DateTime       @default(now()) @map("created_at") @db.DateTime(3)
+  user             User           @relation(fields: [userId], references: [username], onDelete: Cascade)
+  currentLogs      CurrentLog[]
+
+  @@index([userId, logDate, createdAt], map: "idx_log_revisions_user_date_created")
+  @@index([userId, logDate, promoted, createdAt], map: "idx_log_revisions_user_date_promoted")
+  @@index([userId, clientMutationId], map: "idx_log_revisions_client_mutation")
+  @@map("log_revisions")
+}
+
+model CurrentLog {
+  userId            String      @map("user_id") @db.VarChar(191)
+  logDate           String      @map("log_date") @db.Char(10)
+  currentRevisionId String      @map("current_revision_id") @db.Char(36)
+  updatedAt         DateTime    @updatedAt @map("updated_at") @db.DateTime(3)
+  user              User        @relation(fields: [userId], references: [username], onDelete: Cascade)
+  revision          LogRevision @relation(fields: [currentRevisionId], references: [revisionId], onDelete: Restrict)
+
+  @@id([userId, logDate])
+  @@index([currentRevisionId], map: "idx_current_logs_revision")
+  @@map("current_logs")
+}
+
+enum RevisionSource {
+  edit
+  restore
+  import
+}
