@@ -1,0 +1,10 @@
+node_modules
+apps/*/node_modules
+apps/*/dist
+apps/web/dist
+.git
+.turbo
+.serverless
+.dynamodb-data
+coverage
+*.log

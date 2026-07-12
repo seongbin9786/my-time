@@ -1,5 +1,7 @@
 # 에디터 동기화 안정화 재설계 제안
 
+> 상태: 일부 내용은 방안 검토 당시 문서이며, 2026-06-21 기준 최종 채택안은 `docs/SYNC_POLICY_COMPARISON.md`의 "방안 3. Append-only revision + current pointer" 및 ADR 004입니다. 서버는 AWS/DynamoDB가 아니라 NestJS + host MySQL transaction 기준입니다.
+
 ## 1. 문제 정의
 
 백엔드 동기화 도입 이후 에디터가 불안정해진 핵심 원인은 **사용자 편집, 하이드레이션, 복원, 타이머 갱신이 하나의 액션/경로로 섞여** 저장 및 서버 동기화가 무차별적으로 발생하기 때문입니다.  
@@ -31,7 +33,7 @@
 1. **데이터 유실 방지 우선**
 2. **도메인 경계 명확화** (editor/store vs storage payload)
 3. **동기화 경로 단일화** (명확한 상태기계 + 큐)
-4. **서버 CAS 기반의 최종 일관성 보장**
+4. **서버 revision/current pointer 기반의 최종 일관성 보장**
 
 ---
 
@@ -73,18 +75,19 @@
 - hydrate 진행 중 업로드 게이트(`hydrating=true`) 적용
 - 동일 날짜에 대해 동시 다발 요청 금지(serialize)
 
-### 4.4 서버 CAS(Compare-And-Set) 필수화
+### 4.4 서버 append-only revision 저장 필수화
 
-클라이언트는 저장 시 `expectedContentHash`(또는 `expectedVersion`)를 전달합니다.
+클라이언트는 저장 시 `baseRevisionId` 또는 기존 호환용 `parentHash`를 전달합니다.
 
-- 일치 시 저장 성공
-- 불일치 시 `409 Conflict` 반환
+- 서버는 새 content를 항상 revision으로 저장
+- base가 current와 일치하면 current pointer 승격
+- base가 stale이면 current pointer는 유지하고 revision만 보존
 
-백엔드는 조건부 쓰기(예: DynamoDB `ConditionExpression`)로 현재 head 검증 후에만 업데이트해야 합니다.
+백엔드는 MySQL transaction 안에서 현재 pointer를 확인하고, 새 revision insert와 current pointer update를 한 단위로 처리해야 합니다.
 
 ### 4.5 충돌 처리 규약
 
-409 응답 시:
+stale 저장 응답 시:
 
 1. 서버 최신본 fetch
 2. 로컬 스냅샷과 비교 UI 노출
@@ -116,8 +119,8 @@
 
 ### Phase 2 (Backend 정합성 강화)
 
-- CAS API 추가 (`expectedContentHash`/`expectedVersion`)
-- 409 conflict 표준 응답 스키마 확정
+- revision append API 추가 (`baseRevisionId`/`parentHash`)
+- stale 저장 표준 응답 스키마 확정
 - 클라이언트 409 핸들링 연결
 
 ### Phase 3 (운영 신뢰성 강화)
@@ -145,4 +148,3 @@
 2. 데이터 유실 가능성 실질적 감소(클라이언트 + 서버 이중 보호)
 3. 로그인 후 편집에 대한 심리적 불안 해소
 4. 향후 기능 확장(멀티기기/히스토리/머지) 기반 확보
-

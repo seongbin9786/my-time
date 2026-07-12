@@ -1,6 +1,7 @@
 import { saveAs } from 'file-saver';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { calculateHashSync } from '../../utils/HashUtil';
 import { fetchAndDownloadServerBackup } from './backupService';
 
 // Mock file-saver
@@ -385,11 +386,12 @@ describe('backupService', () => {
       storageMock.setItem('token', 'mock-token');
 
       // Mock bulkSaveLogsToServer
+      const savedContentHash = calculateHashSync('legacy log');
       const mockSavedLogs = [
         {
           date: '2025-12-20',
           content: 'legacy log',
-          contentHash: 'hash-123',
+          contentHash: savedContentHash,
           parentHash: null,
           updatedAt: '2026-01-12T00:00:00Z',
         },
@@ -405,14 +407,80 @@ describe('backupService', () => {
       // Verify server sync
       expect(global.fetch).toHaveBeenCalledWith(
         expect.stringContaining('/raw-logs/bulk'),
-        expect.objectContaining({ method: 'POST' }),
+        expect.objectContaining({
+          method: 'POST',
+          body: expect.stringContaining('"source":"import"'),
+        }),
       );
 
       // Verify localStorage (server-provided data should be stored)
       expect(storageMock.setItem).toHaveBeenCalledWith(
         '2025-12-20',
-        expect.stringContaining('hash-123'),
+        expect.stringContaining(savedContentHash),
       );
+      expect(JSON.parse(mockStorage['2025-12-20']).parentHash).toBe(
+        savedContentHash,
+      );
+    });
+
+    it('should skip empty logs when importing backup locally', async () => {
+      const backup = {
+        logs: {
+          '2025-12-24': '',
+          '2025-12-25': 'new log',
+        },
+        settings: {},
+      };
+      const file = createMockFile(backup, 'backup.json');
+
+      const { importBackup } = await import('./backupService');
+      const report = await importBackup(file);
+
+      expect(report.appliedLogs).toBe(1);
+      expect(report.skippedEmptyLogs).toBe(1);
+      expect(mockStorage['2025-12-24']).toBeUndefined();
+      expect(mockStorage['2025-12-25']).toBeDefined();
+    });
+
+    it('should skip empty logs when importing backup with server sync', async () => {
+      const backup = {
+        logs: {
+          '2025-12-24': '',
+          '2025-12-25': 'new log',
+        },
+        settings: {},
+      };
+      const file = createMockFile(backup, 'backup.json');
+
+      storageMock.setItem('token', 'mock-token');
+      vi.mocked(global.fetch).mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          success: true,
+          data: [
+            {
+              date: '2025-12-25',
+              content: 'new log',
+              contentHash: 'hash-123',
+              parentHash: null,
+              updatedAt: '2026-01-12T00:00:00Z',
+            },
+          ],
+        }),
+      } as Response);
+
+      const { importBackup } = await import('./backupService');
+      const report = await importBackup(file);
+
+      expect(report.appliedLogs).toBe(1);
+      expect(report.skippedEmptyLogs).toBe(1);
+      expect(global.fetch).toHaveBeenCalledWith(
+        expect.stringContaining('/raw-logs/bulk'),
+        expect.objectContaining({
+          body: expect.not.stringContaining('"date":"2025-12-24"'),
+        }),
+      );
+      expect(mockStorage['2025-12-24']).toBeUndefined();
     });
 
     it('should clear existing logs before applying backup', async () => {

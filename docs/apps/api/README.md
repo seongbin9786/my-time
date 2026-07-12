@@ -1,203 +1,113 @@
 # My Commit API
 
-Hono 기반 서버리스 API (AWS Lambda + DynamoDB)
+NestJS + host MySQL 기반 API입니다.
 
-## 아키텍처
-
-```
-┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│   API Gateway   │────▶│   AWS Lambda    │────▶│    DynamoDB     │
-│   (HTTP API)    │     │   (Hono App)    │     │                 │
-└─────────────────┘     └─────────────────┘     └─────────────────┘
-```
-
-## 로컬 개발 환경 설정
-
-명령어는 기본적으로 `apps/api` 디렉터리 기준입니다.
-저장소 루트에서 실행하려면 `pnpm --filter my-time-api <명령>` 형태를 사용하세요.
-
-### 사전 요구사항
-
-- Node.js 18+
-- Docker & Docker Compose
-- pnpm
-
-### 1. 환경 변수 설정
-
-```bash
-# 저장소 루트에서 실행
-cp .env.example .env.local
-```
-
-`apps/api` 하위에 별도 `.env` 파일은 사용하지 않습니다.
-
-### 2. 로컬 개발 서버 실행 (권장)
-
-#### 방법 A: Docker + 로컬 서버 (간단)
-
-```bash
-# DynamoDB Local 시작 + 테이블 생성 + 개발 서버 실행
-pnpm local:start
-```
-
-처음 실행하거나 `.dynamodb-data`를 삭제한 경우에도 `local:start`가 테이블 생성을 자동 수행합니다.
-
-#### 방법 B: 단계별 실행
-
-```bash
-# 1. DynamoDB Local 시작 (Docker)
-pnpm db:start
-
-# 2. 테이블 생성
-pnpm db:create-tables
-
-# 3. 개발 서버 실행
-pnpm dev:local
-```
-
-#### 방법 C: Serverless Offline (Lambda 환경 시뮬레이션)
-
-```bash
-# 빌드 후 Serverless Offline 실행
-pnpm sls:offline
-```
-
-### 3. 로컬 서비스 접속
-
-| 서비스            | URL                   |
-| ----------------- | --------------------- |
-| API Server        | http://localhost:3000 |
-| DynamoDB Admin UI | http://localhost:8001 |
-| DynamoDB Local    | http://localhost:8000 |
-
-## 스크립트 명령어
-
-### 개발
-
-| 명령어             | 설명                                         |
-| ------------------ | -------------------------------------------- |
-| `pnpm dev`         | 로컬 개발 서버 실행                          |
-| `pnpm dev:local`   | IS_OFFLINE=true로 개발 서버 실행             |
-| `pnpm local:start` | Docker + 테이블 생성 + 개발 서버 한번에 실행 |
-| `pnpm build`       | 프로덕션 빌드                                |
-
-### DynamoDB Local
-
-| 명령어                  | 설명                         |
-| ----------------------- | ---------------------------- |
-| `pnpm db:start`         | Docker로 DynamoDB Local 시작 |
-| `pnpm db:stop`          | DynamoDB Local 중지          |
-| `pnpm db:create-tables` | 로컬 테이블 생성             |
-| `pnpm db:delete-tables` | 로컬 테이블 삭제             |
-| `pnpm db:reset`         | 테이블 삭제 후 재생성        |
-
-### Serverless Framework
-
-| 명령어                 | 설명                                             |
-| ---------------------- | ------------------------------------------------ |
-| `pnpm sls:offline`     | Serverless Offline 실행 (Lambda 환경 시뮬레이션) |
-| `pnpm sls:deploy`      | 루트 배포 스크립트에서 내부 호출 전용            |
-| `pnpm sls:remove`      | AWS 리소스 제거                                  |
-
-## AWS 배포
-
-### 사전 요구사항
-
-```bash
-# AWS CLI 설정
-aws configure
-```
-
-### 배포
-
-```bash
-# 저장소 루트에서 실행
-pnpm run deploy:dev
-
-# 저장소 루트에서 실행
-pnpm run deploy:prod
-```
-
-`apps/api` 디렉터리에서 직접 `pnpm sls:deploy` 실행은 차단되어 있습니다.
-원격 DynamoDB 테이블은 `serverless.yml`의 `resources` 정의로 배포 시 자동 생성됩니다.
-
-### 리소스 제거
-
-```bash
-pnpm sls:remove
-```
-
-## API 엔드포인트
-
-### 인증
-
-```
-POST /auth/signup   - 회원가입
-POST /auth/login    - 로그인
-```
-
-### 로그 (인증 필요)
-
-```
-POST /raw-logs          - 로그 저장
-GET  /raw-logs/:date    - 날짜별 로그 조회
-```
-
-## 환경 변수
-
-| 변수                   | 설명                    | 기본값                |
-| ---------------------- | ----------------------- | --------------------- |
-| `AWS_REGION`           | AWS 리전                | ap-northeast-2        |
-| `IS_OFFLINE`           | 로컬 DynamoDB 사용 여부 | false                 |
-| `SLS_STAGE`            | 스테이지 이름           | local                 |
-| `JWT_SECRET`           | JWT 서명 키(고정값)     | -                     |
-| `PORT`                 | 서버 포트               | 3000                  |
-
-테이블 이름은 환경변수 오버라이드 없이 `SLS_STAGE` 기준으로 자동 결정됩니다.
-예: `local-my-commit-users`, `prod-my-commit-users`
-
-로컬 개발/배포 환경 변수는 모두 저장소 루트 `.env*` 파일에서 관리합니다.
-
-## 트러블슈팅
-
-### 로그인 시 `ResourceNotFoundException`
-
-다음 에러는 로컬 DynamoDB 테이블이 없는 경우 발생합니다.
+## Architecture
 
 ```text
-Cannot do operations on a non-existent table
+Browser
+  │
+  ▼
+Caddy web container
+  ├─ static web assets
+  └─ /api/* -> NestJS api container
+                  │
+                  ▼
+             host local MySQL
 ```
 
-해결:
+MySQL은 Docker Compose 서비스가 아닙니다. API 컨테이너는 `host.docker.internal`을 통해 host MySQL에 접속합니다.
+
+## Data Model
+
+로그 저장은 append-only revision + current pointer 모델입니다.
+
+- `log_revisions`: 모든 저장 버전의 완전한 원문 snapshot
+- `current_logs`: 날짜별 현재 revision pointer
+
+정상 base로 저장하면 새 revision을 만들고 current pointer를 갱신합니다. stale base로 저장하면 새 revision은 남기지만 current pointer는 바꾸지 않습니다.
+
+## Scripts
+
+`apps/api` 기준:
 
 ```bash
-pnpm db:create-tables
+pnpm dev
+pnpm build
+pnpm start
+pnpm test
+pnpm lint
+pnpm db:migrate
 ```
 
-### 로그인 시 `ECONNREFUSED ...:8000`
+저장소 루트 기준:
 
-다음 에러는 DynamoDB Local 컨테이너가 꺼져 있을 때 발생합니다.
+```bash
+pnpm dev:api
+pnpm build:api
+pnpm --filter my-commit-api test
+pnpm db:migrate
+```
+
+## Environment
+
+루트 `.env.local`을 사용합니다.
+
+```bash
+JWT_SECRET=your-fixed-secret
+DATABASE_URL=mysql://my_commit:my_commit@127.0.0.1:3306/my_commit
+DOCKER_DATABASE_URL=mysql://my_commit:my_commit@host.docker.internal:3306/my_commit
+```
+
+Prisma CLI와 로컬 API는 `DATABASE_URL`을 사용합니다. Docker API는
+`DOCKER_DATABASE_URL`을 사용합니다.
+
+## Endpoints
 
 ```text
-connect ECONNREFUSED ::1:8000
-connect ECONNREFUSED 127.0.0.1:8000
+POST /auth/signup
+POST /auth/login
+
+GET /user-settings
+PUT /user-settings
+
+GET  /raw-logs
+POST /raw-logs
+POST /raw-logs/bulk
+GET  /raw-logs/:date
+GET  /raw-logs/:date/backups
 ```
 
-해결:
+## Migration
 
 ```bash
-pnpm db:start
+pnpm --filter my-commit-api db:migrate
 ```
 
-## 테스트 환경 비교
+Prisma가 `apps/api/prisma/migrations`의 적용 이력을 관리하며 다음 테이블을 생성합니다.
 
-| 기능                   | Docker + dev | Serverless Offline |
-| ---------------------- | ------------ | ------------------ |
-| Lambda 환경 시뮬레이션 | ❌           | ✅                 |
-| API Gateway 시뮬레이션 | ❌           | ✅                 |
-| 핫 리로드              | ✅           | ⚠️                 |
-| DynamoDB               | ✅           | ✅                 |
-| IAM 시뮬레이션         | ❌           | ❌                 |
-| 설정 복잡도            | 낮음         | 중간               |
-| 속도                   | 빠름         | 중간               |
-| 권장 용도              | 일반 개발    | 배포 전 테스트     |
+- `users`
+- `user_settings`
+- `log_revisions`
+- `current_logs`
+
+기존 수동 schema script로 이미 테이블을 만든 DB를 그대로 사용할 때는 최초 한 번
+초기 migration을 baseline 처리한 뒤 deploy합니다.
+
+```bash
+pnpm --filter my-commit-api exec prisma migrate resolve --applied 20260712000000_init
+pnpm db:migrate
+```
+
+## Troubleshooting
+
+### `ECONNREFUSED 127.0.0.1:3306`
+
+Host MySQL is not running or `DATABASE_URL` is wrong.
+
+### Docker container cannot connect to MySQL
+
+Check that MySQL listens on an address reachable from Docker and that the
+`DOCKER_DATABASE_URL` user can connect from the Docker host gateway. On macOS,
+`host.docker.internal` is supported by Docker Desktop. On Linux,
+`docker-compose.yml` adds `host.docker.internal:host-gateway`.

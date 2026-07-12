@@ -92,12 +92,11 @@ startAppListening({
         localData.parentHash,
       );
 
-      if (result && result.success) {
+      if (result && result.success && result.promoted !== false) {
         listenerApi.dispatch(setSyncStatus('synced'));
         if (result.data?.updatedAt) {
           listenerApi.dispatch(setLastSyncedAt(result.data.updatedAt));
-          // 서버 저장 성공 시 parentHash를 서버의 contentHash로 업데이트
-          // (서버가 새로운 부모가 됨)
+          // 다음 편집의 base로 방금 서버 current가 된 content hash를 저장
           saveToStorage(currentDate, nextRawLogs, {
             parentHash: result.data.contentHash,
           });
@@ -205,7 +204,11 @@ startAppListening({
             localHash,
             localParent,
           );
-          if (result?.success && result.data?.updatedAt) {
+          if (
+            result?.success &&
+            result.promoted !== false &&
+            result.data?.updatedAt
+          ) {
             listenerApi.dispatch(setLastSyncedAt(result.data.updatedAt));
             saveToStorage(changedDate, localContent, {
               parentHash: result.data.contentHash,
@@ -252,7 +255,8 @@ startAppListening({
 startAppListening({
   actionCreator: resolveConflict,
   effect: async (action, listenerApi) => {
-    const { currentDate, conflict } = listenerApi.getState().logs;
+    const { conflict } = listenerApi.getOriginalState().logs;
+    const { currentDate } = listenerApi.getState().logs;
 
     if (!conflict) {
       console.error('No conflict to resolve');
@@ -291,7 +295,11 @@ startAppListening({
         parentHash,
       );
 
-      if (result?.success && result.data?.updatedAt) {
+      if (
+        result?.success &&
+        result.promoted !== false &&
+        result.data?.updatedAt
+      ) {
         listenerApi.dispatch(setLastSyncedAt(result.data.updatedAt));
         saveToStorage(currentDate, selectedContent, {
           parentHash: result.data.contentHash,
