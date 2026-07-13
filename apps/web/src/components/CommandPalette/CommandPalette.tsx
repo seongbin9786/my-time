@@ -2,6 +2,9 @@ import clsx from 'clsx';
 import { MinusCircle, PlusCircle, Search } from 'lucide-react';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
+import { Card } from '../ui/card';
+import { Input } from '../ui/input';
+
 export interface Command {
   id: string;
   label: string;
@@ -38,7 +41,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
         {
           id: 'dynamic-add-production',
           label: content ? `생산 기록 추가: ${content}` : '생산 기록 추가',
-          description: '입력한 내용으 생산 기록을 추가합니다',
+          description: '입력한 내용으로 생산 기록을 추가합니다',
           icon: <PlusCircle size={18} />,
           action: () => {
             import('../../utils/commandEvents').then((module) => {
@@ -149,29 +152,35 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="modal modal-open">
-      {/* 배경 클릭 시 닫기 */}
-      <div className="modal-backdrop" onClick={onClose} />
+    <div className="editorial-command-palette fixed inset-0 z-50 flex items-start justify-center px-6 pt-[14vh]">
+      <button
+        type="button"
+        className="absolute inset-0 cursor-default bg-[#241d18]/45 backdrop-blur-[2px]"
+        onClick={onClose}
+        aria-label="명령 팔레트 닫기"
+      />
 
-      <div className="modal-box relative max-w-lg overflow-hidden p-0">
-        {/* 검색 입력 */}
-        <div className="flex items-center gap-3 border-b border-base-300 px-4 py-3">
-          <Search className="h-5 w-5 text-base-content/50" />
-          <input
+      <Card
+        role="dialog"
+        aria-modal="true"
+        aria-label="명령 팔레트"
+        className="relative w-full max-w-xl overflow-hidden rounded-[4px] border-[#bbaa96] bg-[#fbf4e8] shadow-[0_30px_100px_rgba(35,25,18,0.38)]"
+      >
+        <div className="flex items-center gap-3 border-b border-[#cfc1ae] px-5 py-4">
+          <Search className="h-4 w-4 text-[#a64f38]" />
+          <Input
             ref={inputRef}
-            type="text"
-            className="flex-1 bg-transparent text-base outline-none placeholder:text-base-content/40"
-            placeholder="명령어 검색..."
+            className="h-auto flex-1 border-0 bg-transparent px-0 font-serif text-lg focus:border-0 focus:ring-0"
+            placeholder="무엇을 기록할까요?"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
-          <kbd className="kbd kbd-sm">ESC</kbd>
+          <kbd className="editorial-kbd">ESC</kbd>
         </div>
 
-        {/* 커맨드 목록 */}
-        <div ref={listRef} className="max-h-80 overflow-y-auto py-2">
+        <div ref={listRef} className="max-h-80 overflow-y-auto py-2.5">
           {filteredCommands.length === 0 ? (
-            <div className="px-4 py-8 text-center text-base-content/50">
+            <div className="px-5 py-9 text-center font-serif italic text-[#8a7d70]">
               검색 결과가 없습니다
             </div>
           ) : (
@@ -180,10 +189,10 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                 key={command.id}
                 type="button"
                 className={clsx(
-                  'flex w-full items-center gap-3 px-4 py-3 text-left transition-colors',
+                  'flex w-full items-center gap-3 border-l-2 px-5 py-3 text-left transition-colors',
                   index === selectedIndex
-                    ? 'bg-primary/10 text-primary'
-                    : 'hover:bg-base-200',
+                    ? 'border-[#a64f38] bg-[#efe2d2] text-[#8f412e]'
+                    : 'border-transparent text-[#41372f] hover:bg-[#f4eadd]',
                 )}
                 onClick={() => {
                   command.action();
@@ -192,38 +201,43 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                 onMouseEnter={() => setSelectedIndex(index)}
               >
                 {command.icon && (
-                  <span className="flex-shrink-0">{command.icon}</span>
+                  <span className="flex-shrink-0 text-[#a64f38]">
+                    {command.icon}
+                  </span>
                 )}
                 <div className="min-w-0 flex-1">
-                  <div className="font-medium">{command.label}</div>
+                  <div className="font-serif font-semibold">
+                    {command.label}
+                  </div>
                   {command.description && (
-                    <div className="truncate text-sm text-base-content/60">
+                    <div className="mt-0.5 truncate text-[11px] text-[#85786b]">
                       {command.description}
                     </div>
                   )}
                 </div>
-                {index === selectedIndex && <kbd className="kbd kbd-sm">↵</kbd>}
+                {index === selectedIndex && (
+                  <kbd className="editorial-kbd">↵</kbd>
+                )}
               </button>
             ))
           )}
         </div>
 
-        {/* 도움말 */}
-        <div className="flex items-center justify-between border-t border-base-300 bg-base-200/50 px-4 py-2 text-xs text-base-content/60">
+        <div className="flex items-center justify-between border-t border-[#cfc1ae] bg-[#f1e6d8] px-5 py-2.5 text-[10px] text-[#776b5f]">
           <div className="flex items-center gap-4">
             <span>
-              <kbd className="kbd kbd-xs">↑</kbd>
-              <kbd className="kbd kbd-xs">↓</kbd> 이동
+              <kbd className="editorial-kbd">↑</kbd>
+              <kbd className="editorial-kbd">↓</kbd> 이동
             </span>
             <span>
-              <kbd className="kbd kbd-xs">↵</kbd> 실행
+              <kbd className="editorial-kbd">↵</kbd> 실행
             </span>
           </div>
           <span>
-            <kbd className="kbd kbd-xs">ESC</kbd> 닫기
+            <kbd className="editorial-kbd">ESC</kbd> 닫기
           </span>
         </div>
-      </div>
+      </Card>
     </div>
   );
 };
