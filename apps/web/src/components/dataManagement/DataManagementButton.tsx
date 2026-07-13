@@ -110,7 +110,7 @@ export const DataManagementButton = ({ onClick }: Props) => {
     !isAuthenticated && !shouldShowSyncAttemptToast && !shouldShowSuccessToast;
 
   return (
-    <div className="relative">
+    <div className="group relative">
       <button
         type="button"
         className={clsx('btn btn-circle btn-ghost transition-colors', {
@@ -142,7 +142,7 @@ export const DataManagementButton = ({ onClick }: Props) => {
         </div>
       )}
       {shouldShowUnauthenticatedToast && (
-        <div className="animate-in fade-in slide-in-from-top-1 absolute left-1/2 top-full z-50 mt-2 -translate-x-1/2 duration-200">
+        <div className="pointer-events-none absolute left-1/2 top-full z-50 mt-2 -translate-x-1/2 opacity-0 transition-opacity duration-200 group-focus-within:opacity-100 group-hover:opacity-100">
           <div className="relative">
             <div className="whitespace-nowrap rounded-lg border border-error bg-base-100 px-3 py-2 text-xs font-medium text-error shadow-lg">
               동기화가 되고 있지 않습니다.
