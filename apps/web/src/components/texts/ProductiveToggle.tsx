@@ -5,31 +5,40 @@ interface ProductiveToggleProps {
   isProductive: boolean;
   setIsProductive: (value: boolean) => void;
   onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
-  checkboxRef: React.RefObject<HTMLInputElement | null>;
 }
 
 export const ProductiveToggle = ({
   isProductive,
   setIsProductive,
   onKeyDown,
-  checkboxRef,
 }: ProductiveToggleProps) => (
-  <label className="relative inline-flex cursor-pointer items-center">
+  <label className="relative grid h-12 cursor-pointer grid-cols-2 rounded-2xl bg-[#e8eadf] p-1 text-xs font-semibold text-[#28362c]">
     <input
       type="checkbox"
-      className={clsx('toggle toggle-sm', isProductive && 'toggle-success')}
+      className="peer sr-only"
       checked={isProductive}
       onChange={(e) => setIsProductive(e.target.checked)}
       onKeyDown={onKeyDown}
-      ref={checkboxRef}
     />
     <span
       className={clsx(
-        'pointer-events-none absolute flex h-4 w-4 items-center justify-center text-[10px] font-bold text-white transition-all',
-        isProductive ? 'left-3.5' : 'left-0.5',
+        'flex items-center justify-center rounded-xl transition-all peer-focus-visible:ring-2 peer-focus-visible:ring-[#28362c]',
+        isProductive
+          ? 'bg-[#354437] text-[#fffdf6] shadow-sm'
+          : 'text-[#28362c]/45',
       )}
     >
-      {isProductive ? '+' : '-'}
+      + 생산
+    </span>
+    <span
+      className={clsx(
+        'flex items-center justify-center rounded-xl transition-all',
+        isProductive
+          ? 'text-[#28362c]/45'
+          : 'bg-[#f4a88f] text-[#40261e] shadow-sm',
+      )}
+    >
+      − 소비
     </span>
   </label>
 );
