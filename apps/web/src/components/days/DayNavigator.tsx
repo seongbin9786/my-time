@@ -1,6 +1,7 @@
 import { useDispatch } from 'react-redux';
 
 import { goToNextDate, goToPrevDate, goToToday } from '../../store/logs';
+import { Button } from '../ui/button';
 
 const PREV_DAY_BUTTON_TEXT = '←';
 const TODAY_BUTTON_TEXT = '오늘';
@@ -13,19 +14,33 @@ export const DayNavigator = () => {
   const handleTomorrowButton = () => dispatch(goToNextDate());
 
   return (
-    <div className="flex gap-1">
-      <button className="btn btn-xs sm:btn-sm" onClick={handleYesterdayButton}>
-        <span className="sm:text-lg">{PREV_DAY_BUTTON_TEXT}</span>
-      </button>
-      <button
-        className="btn btn-primary btn-xs sm:btn-sm"
+    <div className="mr-2 flex items-center rounded-full bg-[#edf0e6] p-1">
+      <Button
+        variant="ghost"
+        size="sm"
+        className="h-8 w-8 px-0"
+        onClick={handleYesterdayButton}
+        aria-label="이전 날짜"
+      >
+        {PREV_DAY_BUTTON_TEXT}
+      </Button>
+      <Button
+        variant="ghost"
+        size="sm"
+        className="bg-white/80"
         onClick={handleTodayButton}
       >
-        <span className="sm:text-lg">{TODAY_BUTTON_TEXT}</span>
-      </button>
-      <button className="btn btn-xs sm:btn-sm" onClick={handleTomorrowButton}>
-        <span className="sm:text-lg">{NEXT_DAY_BUTTON_TEXT}</span>
-      </button>
+        {TODAY_BUTTON_TEXT}
+      </Button>
+      <Button
+        variant="ghost"
+        size="sm"
+        className="h-8 w-8 px-0"
+        onClick={handleTomorrowButton}
+        aria-label="다음 날짜"
+      >
+        {NEXT_DAY_BUTTON_TEXT}
+      </Button>
     </div>
   );
 };

@@ -2,6 +2,7 @@ import { ChangeEvent, useState } from 'react';
 
 import { DayRatioBar } from '../components/charts/DayRatioBar';
 import { ProductivePaceChart } from '../components/charts/ProductivePaceChart';
+import { Input } from '../components/ui/input';
 import { DEFAULT_PACE_IN_MIN } from '../policies/userConfig';
 import { avgPaceOf, Log } from '../utils/PaceUtil';
 import { loadFromStorage, saveToStorage } from '../utils/StorageUtil';
@@ -28,25 +29,35 @@ export const Area_ProductivePaceChart = ({
   };
 
   return (
-    <div className="flex flex-col gap-2">
-      <div>
-        <h1 className="text-sm font-bold">[생산 페이스]</h1>
-        <DayRatioBar logs={logsForCharts} />
-        <div className="mt-1 flex items-center gap-2">
-          <span className="text-xs">목표 페이스 설정: </span>
-          <input
-            className="input input-bordered input-xs"
+    <div className="flex h-full min-h-0 flex-col gap-3">
+      <div className="grid grid-cols-[1fr_auto] items-end gap-3">
+        <div>
+          <div className="mb-2 flex justify-between text-[9px] font-semibold uppercase tracking-[0.12em] text-[#28362c]/40">
+            <span>소비</span>
+            <span>생산</span>
+          </div>
+          <DayRatioBar logs={logsForCharts} />
+        </div>
+        <label className="flex items-center gap-2">
+          <span className="text-[9px] font-semibold uppercase tracking-[0.12em] text-[#28362c]/40">
+            목표
+          </span>
+          <Input
+            className="h-8 w-16 rounded-xl px-2 font-mono text-xs"
             value={targetPace}
             onChange={updateTargetPace}
+            inputMode="numeric"
+            aria-label="목표 생산 페이스"
           />
-        </div>
+        </label>
       </div>
-      <ProductivePaceChart
-        data={logsForCharts}
-        totalAvg={0}
-        targetPace={targetPace}
-        todayAvg={avgPaceOf(logsForCharts)}
-      />
+      <div className="min-h-0 flex-1">
+        <ProductivePaceChart
+          data={logsForCharts}
+          targetPace={targetPace}
+          todayAvg={logsForCharts.length ? avgPaceOf(logsForCharts) : 0}
+        />
+      </div>
     </div>
   );
 };

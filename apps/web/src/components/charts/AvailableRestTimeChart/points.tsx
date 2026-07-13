@@ -11,7 +11,7 @@ export const getPoints = (data: ChartDataPoint[]) => {
   const points: ReactElement[] = [];
 
   if (highPoint) {
-    const color = highPoint.need >= 0 ? 'red' : 'green';
+    const color = highPoint.need >= 0 ? '#d87f62' : '#718466';
     points.push(
       <ReferenceDot
         key="high"
@@ -34,7 +34,7 @@ export const getPoints = (data: ChartDataPoint[]) => {
   }
 
   if (lowPoint) {
-    const color = lowPoint.need >= 0 ? 'red' : 'green';
+    const color = lowPoint.need >= 0 ? '#d87f62' : '#718466';
     points.push(
       <ReferenceDot
         key="low"
@@ -117,7 +117,7 @@ function isNearPoint(
 type CurrentPointConfig = {
   point: ChartDataPoint | null;
   shouldShow: boolean;
-  color: 'red' | 'green';
+  color: string;
   position: 'top' | 'bottom';
 };
 
@@ -131,14 +131,14 @@ function getCurrentPointConfig(
     return {
       point: null,
       shouldShow: false,
-      color: 'red',
+      color: '#d87f62',
       position: 'top',
     };
   }
 
   const shouldShow =
     !isNearPoint(currPoint, highPoint) && !isNearPoint(currPoint, lowPoint);
-  const color = currPoint.need >= 0 ? 'red' : 'green';
+  const color = currPoint.need >= 0 ? '#d87f62' : '#718466';
   const position = currPoint.need >= 0 ? 'top' : 'bottom';
 
   return { point: currPoint, shouldShow, color, position };

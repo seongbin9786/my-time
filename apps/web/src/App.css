@@ -2,6 +2,123 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  html,
+  body,
+  #root {
+    min-height: 100%;
+  }
+
+  body {
+    margin: 0;
+    background: #edf0e6;
+  }
+
+  ::selection {
+    background: #b9c8a3;
+    color: #28362c;
+  }
+}
+
+.calm-shell {
+  font-family: 'Avenir Next', 'Trebuchet MS', sans-serif;
+}
+
+.calm-shell .font-serif {
+  font-family: 'Iowan Old Style', 'Palatino Linotype', Palatino, serif;
+}
+
+.calm-orb {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(2px);
+  pointer-events: none;
+}
+
+.calm-orb-one {
+  top: 70px;
+  right: -160px;
+  width: 430px;
+  height: 430px;
+  background: rgb(244 168 143 / 22%);
+}
+
+.calm-orb-two {
+  bottom: 120px;
+  left: -180px;
+  width: 470px;
+  height: 470px;
+  background: rgb(185 200 163 / 33%);
+}
+
+.calm-shell section > *,
+.calm-shell main > * {
+  animation: calm-arrive 480ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.calm-shell section > *:nth-child(2),
+.calm-shell main > *:nth-child(2) {
+  animation-delay: 70ms;
+}
+
+.calm-shell main > *:nth-child(3) {
+  animation-delay: 120ms;
+}
+
+.calm-shell main > *:nth-child(4) {
+  animation-delay: 170ms;
+}
+
+.calm-shell header .btn-circle,
+.calm-shell header .btn-sm {
+  min-height: 2.5rem;
+  height: 2.5rem;
+  border: 0;
+  border-radius: 9999px;
+  background: transparent;
+  color: #28362c;
+}
+
+.calm-shell header .btn-circle {
+  width: 2.5rem;
+}
+
+.calm-shell header .dropdown-content {
+  border: 1px solid rgb(40 54 44 / 15%);
+  border-radius: 1.5rem;
+  background: #fffdf6;
+  color: #28362c;
+}
+
+.calm-log-editor {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 27px,
+    rgb(40 54 44 / 7%) 27px,
+    rgb(40 54 44 / 7%) 28px
+  );
+  background-position-y: 16px;
+}
+
+@keyframes calm-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.995);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .calm-shell section > *,
+  .calm-shell main > * {
+    animation: none;
+  }
+}
+
 @keyframes shake {
   0% {
     transform: translateX(0);

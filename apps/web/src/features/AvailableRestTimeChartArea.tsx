@@ -10,11 +10,12 @@ export const Area_AvailableRestTimeChart = ({
 }: {
   logsForCharts: Log[];
 }) => (
-  <div className="flex flex-col gap-2">
-    <div className="h-10">
-      <h1 className="text-sm font-bold">[초과 휴식 시간]</h1>
+  <div className="flex h-full min-h-0 flex-col gap-3">
+    <div>
       <TimeSummary logs={logsForCharts} />
     </div>
-    <AvailableRestTimeChart logs={logsForCharts} />
+    <div className="min-h-0 flex-1">
+      <AvailableRestTimeChart logs={logsForCharts} />
+    </div>
   </div>
 );
