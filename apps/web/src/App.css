@@ -2,6 +2,86 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  html,
+  body,
+  #root {
+    min-height: 100%;
+  }
+
+  body {
+    margin: 0;
+  }
+
+  ::selection {
+    background: #0a0a0a;
+    color: #fff;
+  }
+}
+
+.monochrome-shell {
+  font-family: 'Avenir Next', 'Century Gothic', sans-serif;
+}
+
+.monochrome-shell > div > section,
+.monochrome-shell > div > main {
+  animation: focus-rise 420ms ease-out both;
+}
+
+.monochrome-shell > div > section:nth-of-type(2) {
+  animation-delay: 80ms;
+}
+
+.monochrome-shell > div > main {
+  animation-delay: 140ms;
+}
+
+.monochrome-shell header .dropdown > .btn,
+.monochrome-shell header .btn-circle {
+  min-height: 2.25rem;
+  height: 2.25rem;
+  width: 2.25rem;
+  border-radius: 0;
+  background: transparent;
+  color: #0a0a0a;
+}
+
+.monochrome-shell header .dropdown-content {
+  border: 1px solid #171717;
+  border-radius: 0;
+  background: #fff;
+  color: #171717;
+}
+
+.monochrome-log-editor {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 27px,
+    rgb(0 0 0 / 7%) 27px,
+    rgb(0 0 0 / 7%) 28px
+  );
+  background-position-y: 15px;
+}
+
+@keyframes focus-rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .monochrome-shell > div > section,
+  .monochrome-shell > div > main {
+    animation: none;
+  }
+}
+
 @keyframes shake {
   0% {
     transform: translateX(0);

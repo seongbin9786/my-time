@@ -23,30 +23,31 @@ export const TimeSummary = ({ logs }: TimeSummaryProps) => {
 
   const isProductiveSurplus = difference >= 0;
   const label = isProductiveSurplus ? '확보 시간' : '초과 시간';
-  const colorClass = isProductiveSurplus ? 'text-green-600' : 'text-red-600';
-
   return (
-    <div className="flex gap-1 text-lg">
-      <span>
-        {label}: [
-        <span className={`font-bold ${colorClass}`}>
-          {minutesToTimeString(Math.abs(difference))}
+    <div className="grid grid-cols-3 gap-2 border-b border-black/10 pb-3">
+      <span className="flex flex-col">
+        <span className="font-mono text-[9px] uppercase tracking-[0.12em] text-neutral-500">
+          {label}
         </span>
-        ]
+        <strong className="mt-1 text-sm font-semibold">
+          {minutesToTimeString(Math.abs(difference))}
+        </strong>
       </span>
-      <span>
-        생산{' '}
-        <span className="font-bold text-green-600">
+      <span className="flex flex-col border-l border-black/10 pl-3">
+        <span className="font-mono text-[9px] uppercase tracking-[0.12em] text-neutral-500">
+          생산 · {productiveRatio}%
+        </span>
+        <strong className="mt-1 text-sm font-semibold">
           {minutesToTimeString(productive)}
-        </span>{' '}
-        ({productiveRatio}%)
+        </strong>
       </span>
-      <span>
-        소비{' '}
-        <span className="font-bold text-red-600">
+      <span className="flex flex-col border-l border-black/10 pl-3">
+        <span className="font-mono text-[9px] uppercase tracking-[0.12em] text-neutral-500">
+          소비 · {wastedRatio}%
+        </span>
+        <strong className="mt-1 text-sm font-semibold">
           {minutesToTimeString(wasted)}
-        </span>{' '}
-        ({wastedRatio}%)
+        </strong>
       </span>
     </div>
   );

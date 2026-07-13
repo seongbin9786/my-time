@@ -14,66 +14,86 @@ import { Log } from '../../utils/PaceUtil';
 
 interface ProductivePaceChartProps {
   data: Log[];
-  totalAvg: number;
   todayAvg: number;
   targetPace: number;
 }
 
 export const ProductivePaceChart = ({
   data,
-  totalAvg,
   todayAvg,
   targetPace,
 }: ProductivePaceChartProps) => {
+  if (data.length < 2) {
+    return (
+      <div className="flex h-full min-h-44 items-center justify-center border border-dashed border-neutral-300 font-mono text-[10px] uppercase tracking-[0.14em] text-neutral-400">
+        기록을 두 개 이상 추가하면 페이스가 표시됩니다
+      </div>
+    );
+  }
+
   return (
-    <ResponsiveContainer className="min-h-0">
+    <ResponsiveContainer className="min-h-0" width="100%" height="100%">
       <AreaChart
         data={data}
         margin={{
-          top: 10,
-          right: 30,
-          left: 0,
-          bottom: 0,
+          top: 18,
+          right: 18,
+          left: -12,
+          bottom: 8,
         }}
       >
-        <CartesianGrid strokeDasharray="3 3" />
+        <CartesianGrid
+          stroke="#deded9"
+          strokeDasharray="2 5"
+          vertical={false}
+        />
         <XAxis
           dataKey="offset"
           type="number"
-          tick={{ fontSize: 16 }}
+          axisLine={false}
+          tickLine={false}
+          tick={{ fontSize: 10, fill: '#737373' }}
           tickFormatter={minutesToTimeString}
           domain={[8 * 60, 27 * 60]}
         />
         <YAxis
           domain={[0, 60]}
           allowDataOverflow={true}
-          tick={{ fontSize: 16 }}
+          axisLine={false}
+          tickLine={false}
+          tick={{ fontSize: 10, fill: '#737373' }}
         />
-        <Tooltip labelFormatter={minutesToTimeString} />
+        <Tooltip
+          labelFormatter={minutesToTimeString}
+          contentStyle={{
+            border: '1px solid #171717',
+            borderRadius: 0,
+            boxShadow: 'none',
+            fontSize: 11,
+          }}
+        />
         <ReferenceLine
           y={targetPace}
-          stroke="red"
-          label={{ value: `목표: ${targetPace}min/h`, fontSize: 16 }}
-        />
-        <ReferenceLine
-          y={totalAvg}
-          stroke="blue"
+          stroke="#171717"
+          strokeDasharray="4 4"
           label={{
-            value: `[미지원] 전체 평균(${totalAvg}min/h)`,
-            fontSize: 16,
+            value: `목표 ${targetPace}`,
+            fontSize: 10,
+            fill: '#171717',
           }}
         />
         <ReferenceLine
           y={todayAvg}
-          stroke="green"
-          label={{ value: `오늘 평균(${todayAvg}min/h)`, fontSize: 16 }}
+          stroke="#737373"
+          label={{ value: `오늘 ${todayAvg}`, fontSize: 10, fill: '#737373' }}
         />
         <Area
           type="monotone"
           dataKey={(o) => o.pace}
           unit="min/h"
-          stroke="darkgreen"
-          fill="green"
+          stroke="#171717"
+          strokeWidth={1.5}
+          fill="#d4d4d4"
         />
       </AreaChart>
     </ResponsiveContainer>
