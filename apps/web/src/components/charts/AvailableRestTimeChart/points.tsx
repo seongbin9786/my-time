@@ -11,22 +11,23 @@ export const getPoints = (data: ChartDataPoint[]) => {
   const points: ReactElement[] = [];
 
   if (highPoint) {
-    const color = highPoint.need >= 0 ? 'red' : 'green';
+    const color = highPoint.need >= 0 ? '#ff6b4a' : '#c9ff3d';
     points.push(
       <ReferenceDot
         key="high"
         x={highPoint.offset}
         y={highPoint.need}
-        r={5}
+        r={3.5}
         fill={color}
-        stroke="white"
-        strokeWidth={2}
+        stroke="#080b09"
+        strokeWidth={1.5}
       >
         <Label
           value={formatMinutesWithSign(highPoint.need)}
           position="top"
           fill={color}
-          fontSize={14}
+          fontSize={9}
+          fontFamily="monospace"
           fontWeight="bold"
         />
       </ReferenceDot>,
@@ -34,22 +35,23 @@ export const getPoints = (data: ChartDataPoint[]) => {
   }
 
   if (lowPoint) {
-    const color = lowPoint.need >= 0 ? 'red' : 'green';
+    const color = lowPoint.need >= 0 ? '#ff6b4a' : '#c9ff3d';
     points.push(
       <ReferenceDot
         key="low"
         x={lowPoint.offset}
         y={lowPoint.need}
-        r={5}
+        r={3.5}
         fill={color}
-        stroke="white"
-        strokeWidth={2}
+        stroke="#080b09"
+        strokeWidth={1.5}
       >
         <Label
           value={formatMinutesWithSign(lowPoint.need)}
           position="bottom"
           fill={color}
-          fontSize={14}
+          fontSize={9}
+          fontFamily="monospace"
           fontWeight="bold"
         />
       </ReferenceDot>,
@@ -62,16 +64,17 @@ export const getPoints = (data: ChartDataPoint[]) => {
         key="current"
         x={currentPointConfig.point.offset}
         y={currentPointConfig.point.need}
-        r={6}
+        r={4}
         fill={currentPointConfig.color}
-        stroke="white"
-        strokeWidth={2}
+        stroke="#080b09"
+        strokeWidth={1.5}
       >
         <Label
           value={formatMinutesWithSign(currentPointConfig.point.need)}
           position={currentPointConfig.position}
           fill={currentPointConfig.color}
-          fontSize={14}
+          fontSize={9}
+          fontFamily="monospace"
           fontWeight="bold"
         />
       </ReferenceDot>,
@@ -117,7 +120,7 @@ function isNearPoint(
 type CurrentPointConfig = {
   point: ChartDataPoint | null;
   shouldShow: boolean;
-  color: 'red' | 'green';
+  color: '#ff6b4a' | '#c9ff3d';
   position: 'top' | 'bottom';
 };
 
@@ -131,14 +134,14 @@ function getCurrentPointConfig(
     return {
       point: null,
       shouldShow: false,
-      color: 'red',
+      color: '#ff6b4a',
       position: 'top',
     };
   }
 
   const shouldShow =
     !isNearPoint(currPoint, highPoint) && !isNearPoint(currPoint, lowPoint);
-  const color = currPoint.need >= 0 ? 'red' : 'green';
+  const color = currPoint.need >= 0 ? '#ff6b4a' : '#c9ff3d';
   const position = currPoint.need >= 0 ? 'top' : 'bottom';
 
   return { point: currPoint, shouldShow, color, position };

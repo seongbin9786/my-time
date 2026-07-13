@@ -1,4 +1,5 @@
 import clsx from 'clsx';
+import { CornerDownLeft, Minus, Plus, TerminalSquare } from 'lucide-react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -27,12 +28,15 @@ import {
   parseTimeInput,
 } from '../../utils/timeUtils';
 import { RestTimeInputDialog } from '../dialogs/RestTimeInputDialog';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
+import { Textarea } from '../ui/textarea';
 import { ProductiveToggle } from './ProductiveToggle';
 
 const storageListener = new StorageListener();
 
 export const TextLogContainer = () => {
-  const checkboxRef = useRef<HTMLInputElement>(null); // NOTE: +/- 여부를 스페이스바로 쉽게 토글하고, 탭으로 곧장 quick input으로 이동 가능하므로, checkbox에 focus 둠.
+  const checkboxRef = useRef<HTMLInputElement>(null); // +/- 여부를 스페이스바로 토글하기 위한 실제 checkbox
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const timeInputRef = useRef<HTMLInputElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -140,7 +144,7 @@ export const TextLogContainer = () => {
     dispatch(clearRestNotification());
 
     resetInputs();
-    textareaRef.current?.focus();
+    inputRef.current?.focus();
   };
 
   const resetInputs = useCallback(() => {
@@ -179,7 +183,7 @@ export const TextLogContainer = () => {
       // 상태 초기화
       resetInputs();
       setPendingRestLog(null);
-      textareaRef.current?.focus();
+      inputRef.current?.focus();
     },
     [dispatch, pendingRestLog, resetInputs, setRawLogs, timeInput],
   );
@@ -218,7 +222,7 @@ export const TextLogContainer = () => {
 
   useEffect(() => {
     synchronizeInput();
-    checkboxRef.current?.focus();
+    inputRef.current?.focus();
   }, [synchronizeInput]);
 
   // handleDateChange를 하지 말고, 여기서 return을 해서 cleanup을 하도록 하면 prevDate 만들 필요 없음.
@@ -228,7 +232,7 @@ export const TextLogContainer = () => {
       const localData = loadFromStorage(currentDate);
       dispatch(hydrateRawLog(localData.content));
     });
-    checkboxRef.current?.focus();
+    inputRef.current?.focus();
   }, [currentDate, dispatch]);
 
   const handleQuickAppend = useCallback(
@@ -249,7 +253,7 @@ export const TextLogContainer = () => {
       resetInputs();
       // 커맨드 팔레트가 닫힌 후 포커스 이동
       setTimeout(() => {
-        textareaRef.current?.focus();
+        inputRef.current?.focus();
       }, 100);
     },
     [currentTimeConsideringMaxTime, dispatch, resetInputs, setRawLogs],
@@ -274,75 +278,137 @@ export const TextLogContainer = () => {
     };
   }, [handleQuickAppend]);
 
-  return (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-center gap-2">
-        <ProductiveToggle
-          isProductive={isProductive}
-          setIsProductive={setIsProductive}
-          onKeyDown={handleEnterOnCheckbox}
-          checkboxRef={checkboxRef}
-        />
-        <input
-          ref={timeInputRef}
-          type="text"
-          className={clsx(
-            'input input-bordered w-20 text-xs',
-            isTimeInputShaking ? 'shake-animation' : '',
-          )}
-          placeholder={currentTimeConsideringMaxTime}
-          value={timeInput}
-          onChange={handleTimeInputChange}
-          onKeyDown={handleEnterOnTextInput}
-        />
-        <input
-          ref={inputRef}
-          type="text"
-          className={clsx(
-            'input input-bordered flex-1 text-xs',
-            isQuickInputShaking ? 'shake-animation' : '',
-          )}
-          placeholder="Enter 키를 눌러 활동 내역 추가"
-          value={quickInput}
-          onChange={handleQuickInputChange}
-          onKeyDown={handleEnterOnTextInput}
-        />
-        <button
-          type="button"
-          className="btn btn-primary btn-sm"
-          onClick={appendLog}
-        >
-          추가
-        </button>
+  const logLineCount = rawLogs.trim()
+    ? rawLogs.split('\n').filter((line) => line.trim()).length
+    : 0;
 
-        {/* 간단 입력 영역 */}
-        <div className="flex items-center gap-1 border-l border-base-300 pl-2">
-          <span className="text-xs text-base-content/60">간단 입력</span>
-          <button
-            type="button"
-            className="btn btn-success btn-outline btn-xs"
-            onClick={() => handleQuickAppend(true, '생산')}
-            title="생산 기록 추가"
-          >
-            +
-          </button>
-          <button
-            type="button"
-            className="btn btn-warning btn-outline btn-xs"
-            onClick={() => handleQuickAppend(false, '소비')}
-            title="소비 기록 추가"
-          >
-            −
-          </button>
+  return (
+    <div className="flex h-full min-h-0 flex-col">
+      <div className="border-b border-[#202621] p-4">
+        <div className="mb-4 flex items-start justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2 font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-[#f0f4f0]">
+              <TerminalSquare size={14} className="text-[#c9ff3d]" />
+              Activity ingest
+            </div>
+            <p className="mt-1 font-mono text-[10px] text-[#697169]">
+              시각을 비우면 현재 시각으로 기록합니다.
+            </p>
+          </div>
+          <div className="flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.1em] text-[#6f776f]">
+            <span className="flex items-center gap-1">
+              focus
+              <kbd className="deck-key">/</kbd>
+            </span>
+            <span className="flex items-center gap-1">
+              palette
+              <kbd className="deck-key">⌘/Ctrl P</kbd>
+            </span>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-[112px_88px_minmax(0,1fr)_96px] items-end gap-2">
+          <div>
+            <label className="mb-1.5 block font-mono text-[9px] uppercase tracking-[0.16em] text-[#697169]">
+              Mode
+            </label>
+            <ProductiveToggle
+              isProductive={isProductive}
+              setIsProductive={setIsProductive}
+              onKeyDown={handleEnterOnCheckbox}
+              checkboxRef={checkboxRef}
+            />
+          </div>
+          <div>
+            <label
+              htmlFor="quick-log-time"
+              className="mb-1.5 block font-mono text-[9px] uppercase tracking-[0.16em] text-[#697169]"
+            >
+              Time
+            </label>
+            <Input
+              id="quick-log-time"
+              ref={timeInputRef}
+              className={clsx(
+                'px-2 text-center',
+                isTimeInputShaking && 'shake-animation border-[#ff6b4a]',
+              )}
+              placeholder={currentTimeConsideringMaxTime}
+              value={timeInput}
+              onChange={handleTimeInputChange}
+              onKeyDown={handleEnterOnTextInput}
+              aria-label="기록 시각"
+            />
+          </div>
+          <div>
+            <label
+              htmlFor="quick-log-activity"
+              className="mb-1.5 block font-mono text-[9px] uppercase tracking-[0.16em] text-[#697169]"
+            >
+              Activity
+            </label>
+            <Input
+              id="quick-log-activity"
+              ref={inputRef}
+              className={clsx(
+                isQuickInputShaking && 'shake-animation border-[#ff6b4a]',
+              )}
+              placeholder="무엇에 시간을 쓰고 있나요?"
+              value={quickInput}
+              onChange={handleQuickInputChange}
+              onKeyDown={handleEnterOnTextInput}
+            />
+          </div>
+          <Button onClick={appendLog} className="w-full">
+            Commit
+            <CornerDownLeft size={13} />
+          </Button>
+        </div>
+
+        <div className="mt-3 flex items-center justify-between gap-3 border-t border-[#1d221e] pt-3">
+          <span className="hidden font-mono text-[9px] uppercase tracking-[0.16em] text-[#586058] xl:inline">
+            Zero-input actions
+          </span>
+          <div className="flex gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => handleQuickAppend(true, '생산')}
+              title="현재 시각에 생산 기록 추가"
+            >
+              <Plus size={12} className="text-[#c9ff3d]" />
+              Production now
+              <kbd className="deck-key deck-key-dark">Alt 1</kbd>
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => handleQuickAppend(false, '소비')}
+              title="현재 시각에 소비 기록 추가"
+            >
+              <Minus size={12} className="text-[#ffb52e]" />
+              Consumption now
+              <kbd className="deck-key deck-key-dark">Alt 2</kbd>
+            </Button>
+          </div>
         </div>
       </div>
 
-      <textarea
-        className="textarea textarea-bordered textarea-lg mb-2 aspect-square flex-1 text-xs"
-        value={rawLogs}
-        ref={textareaRef}
-        onChange={handleChange}
-      />
+      <div className="flex min-h-0 flex-1 flex-col p-4 pt-3">
+        <div className="mb-2 flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.16em] text-[#687068]">
+          <span>Raw event stream / editable source</span>
+          <span className="text-[#9ca59d]">{logLineCount} entries</span>
+        </div>
+        <Textarea
+          className="min-h-0 flex-1"
+          value={rawLogs}
+          ref={textareaRef}
+          onChange={handleChange}
+          spellCheck={false}
+          aria-label="원본 활동 로그"
+          placeholder="[09:00] + 첫 활동을 기록하세요"
+        />
+      </div>
 
       <RestTimeInputDialog
         isOpen={isRestDialogOpen}

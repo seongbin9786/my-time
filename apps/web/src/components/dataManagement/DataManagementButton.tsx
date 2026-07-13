@@ -101,13 +101,13 @@ export const DataManagementButton = ({ onClick }: Props) => {
   };
 
   const syncAttemptLabel = '동기화 시도 중...';
-  const buttonTitle =
-    isAuthenticated && isSyncAttempting ? syncAttemptLabel : '데이터 관리';
+  let buttonTitle = '데이터 관리 (로그인 시 서버 동기화)';
+  if (isAuthenticated) {
+    buttonTitle = isSyncAttempting ? syncAttemptLabel : '데이터 관리';
+  }
   const shouldShowSyncAttemptToast = isAuthenticated && isSyncAttempting;
   const shouldShowSuccessToast =
     isAuthenticated && showToast && !isSyncAttempting;
-  const shouldShowUnauthenticatedToast =
-    !isAuthenticated && !shouldShowSyncAttemptToast && !shouldShowSuccessToast;
 
   return (
     <div className="relative">
@@ -138,16 +138,6 @@ export const DataManagementButton = ({ onClick }: Props) => {
         <div className="animate-in fade-in slide-in-from-top-1 absolute left-1/2 top-full z-50 mt-2 -translate-x-1/2 duration-200">
           <div className="whitespace-nowrap rounded-lg border border-success/30 bg-success/10 px-3 py-2 text-xs font-medium text-success shadow-lg">
             동기화 완료{formattedDuration ? ` (${formattedDuration})` : ''}
-          </div>
-        </div>
-      )}
-      {shouldShowUnauthenticatedToast && (
-        <div className="animate-in fade-in slide-in-from-top-1 absolute left-1/2 top-full z-50 mt-2 -translate-x-1/2 duration-200">
-          <div className="relative">
-            <div className="whitespace-nowrap rounded-lg border border-error bg-base-100 px-3 py-2 text-xs font-medium text-error shadow-lg">
-              동기화가 되고 있지 않습니다.
-            </div>
-            <div className="absolute -top-[5px] left-1/2 h-2.5 w-2.5 -translate-x-1/2 rotate-45 border-l border-t border-error bg-base-100"></div>
           </div>
         </div>
       )}

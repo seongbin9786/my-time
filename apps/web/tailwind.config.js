@@ -2,7 +2,17 @@
 export default {
   content: ['./src/**/*.{html,js,ts,jsx,tsx}'],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        mono: [
+          '"SFMono-Regular"',
+          '"Cascadia Code"',
+          '"Roboto Mono"',
+          'ui-monospace',
+          'monospace',
+        ],
+      },
+    },
   },
   plugins: [require('daisyui')],
   daisyui: {

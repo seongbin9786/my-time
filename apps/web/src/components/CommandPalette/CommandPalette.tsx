@@ -2,6 +2,11 @@ import clsx from 'clsx';
 import { MinusCircle, PlusCircle, Search } from 'lucide-react';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
+import {
+  dispatchAddConsumptionStart,
+  dispatchAddProductionStart,
+} from '../../utils/commandEvents';
+
 export interface Command {
   id: string;
   label: string;
@@ -38,12 +43,10 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
         {
           id: 'dynamic-add-production',
           label: content ? `생산 기록 추가: ${content}` : '생산 기록 추가',
-          description: '입력한 내용으 생산 기록을 추가합니다',
+          description: '입력한 내용으로 생산 기록을 추가합니다',
           icon: <PlusCircle size={18} />,
           action: () => {
-            import('../../utils/commandEvents').then((module) => {
-              module.dispatchAddProductionStart(content);
-            });
+            dispatchAddProductionStart(content);
           },
         },
       ];
@@ -59,9 +62,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
           description: '입력한 내용으로 소비 기록을 추가합니다',
           icon: <MinusCircle size={18} />,
           action: () => {
-            import('../../utils/commandEvents').then((module) => {
-              module.dispatchAddConsumptionStart(content);
-            });
+            dispatchAddConsumptionStart(content);
           },
         },
       ];
@@ -85,11 +86,13 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
   // 팔레트가 열릴 때 상태 초기화 및 포커스
   useEffect(() => {
     if (isOpen) {
-      setSearchQuery('');
-      setSelectedIndex(0);
-      setTimeout(() => {
+      const focusTimer = setTimeout(() => {
+        setSearchQuery('');
+        setSelectedIndex(0);
         inputRef.current?.focus();
-      }, 50);
+      }, 0);
+
+      return () => clearTimeout(focusTimer);
     }
   }, [isOpen]);
 
@@ -141,37 +144,47 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
     }
   }, [selectedIndex, filteredCommands.length]);
 
-  // 검색어 변경 시 선택 인덱스 초기화
-  useEffect(() => {
-    setSelectedIndex(0);
-  }, [searchQuery]);
-
   if (!isOpen) return null;
 
   return (
-    <div className="modal modal-open">
-      {/* 배경 클릭 시 닫기 */}
-      <div className="modal-backdrop" onClick={onClose} />
+    <div className="fixed inset-0 z-[100] flex items-start justify-center px-4 pt-[12vh] font-mono">
+      <button
+        type="button"
+        className="absolute inset-0 cursor-default bg-[#020302]/85 backdrop-blur-sm"
+        onClick={onClose}
+        aria-label="커맨드 팔레트 닫기"
+      />
 
-      <div className="modal-box relative max-w-lg overflow-hidden p-0">
+      <div className="relative w-full max-w-xl overflow-hidden border border-[#3a423b] bg-[#080b09] shadow-[0_30px_100px_rgba(0,0,0,0.75),0_0_0_1px_rgba(201,255,61,0.05)]">
+        <div className="flex items-center justify-between border-b border-[#262c27] bg-[#0d110e] px-4 py-2">
+          <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#c9ff3d]">
+            Command routing
+          </span>
+          <span className="text-[8px] uppercase tracking-[0.14em] text-[#59625a]">
+            Focus deck / 01
+          </span>
+        </div>
         {/* 검색 입력 */}
-        <div className="flex items-center gap-3 border-b border-base-300 px-4 py-3">
-          <Search className="h-5 w-5 text-base-content/50" />
+        <div className="flex items-center gap-3 border-b border-[#303631] px-4 py-4">
+          <Search className="h-4 w-4 text-[#c9ff3d]" />
           <input
             ref={inputRef}
             type="text"
-            className="flex-1 bg-transparent text-base outline-none placeholder:text-base-content/40"
-            placeholder="명령어 검색..."
+            className="flex-1 bg-transparent text-sm text-[#edf2ed] outline-none placeholder:text-[#566057]"
+            placeholder="명령 검색 또는 + / - 로 즉시 기록..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setSelectedIndex(0);
+            }}
           />
-          <kbd className="kbd kbd-sm">ESC</kbd>
+          <kbd className="deck-key">ESC</kbd>
         </div>
 
         {/* 커맨드 목록 */}
-        <div ref={listRef} className="max-h-80 overflow-y-auto py-2">
+        <div ref={listRef} className="max-h-80 overflow-y-auto p-2">
           {filteredCommands.length === 0 ? (
-            <div className="px-4 py-8 text-center text-base-content/50">
+            <div className="border border-dashed border-[#2a302b] px-4 py-10 text-center text-[10px] uppercase tracking-[0.12em] text-[#687169]">
               검색 결과가 없습니다
             </div>
           ) : (
@@ -180,10 +193,10 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                 key={command.id}
                 type="button"
                 className={clsx(
-                  'flex w-full items-center gap-3 px-4 py-3 text-left transition-colors',
+                  'flex w-full items-center gap-3 border px-3 py-3 text-left transition-colors',
                   index === selectedIndex
-                    ? 'bg-primary/10 text-primary'
-                    : 'hover:bg-base-200',
+                    ? 'border-[#c9ff3d]/40 bg-[#c9ff3d]/10 text-[#c9ff3d]'
+                    : 'border-transparent text-[#b7c0b8] hover:border-[#2f3630] hover:bg-[#101511]',
                 )}
                 onClick={() => {
                   command.action();
@@ -192,35 +205,38 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                 onMouseEnter={() => setSelectedIndex(index)}
               >
                 {command.icon && (
-                  <span className="flex-shrink-0">{command.icon}</span>
+                  <span className="flex-shrink-0 opacity-80">
+                    {command.icon}
+                  </span>
                 )}
                 <div className="min-w-0 flex-1">
-                  <div className="font-medium">{command.label}</div>
+                  <div className="text-[11px] font-bold uppercase tracking-[0.08em]">
+                    {command.label}
+                  </div>
                   {command.description && (
-                    <div className="truncate text-sm text-base-content/60">
+                    <div className="mt-1 truncate text-[9px] text-[#697269]">
                       {command.description}
                     </div>
                   )}
                 </div>
-                {index === selectedIndex && <kbd className="kbd kbd-sm">↵</kbd>}
+                {index === selectedIndex && <kbd className="deck-key">↵</kbd>}
               </button>
             ))
           )}
         </div>
 
         {/* 도움말 */}
-        <div className="flex items-center justify-between border-t border-base-300 bg-base-200/50 px-4 py-2 text-xs text-base-content/60">
-          <div className="flex items-center gap-4">
+        <div className="flex items-center justify-between border-t border-[#303631] bg-[#0d110e] px-4 py-2 text-[8px] uppercase tracking-[0.12em] text-[#626b63]">
+          <div className="flex items-center gap-3">
             <span>
-              <kbd className="kbd kbd-xs">↑</kbd>
-              <kbd className="kbd kbd-xs">↓</kbd> 이동
+              <kbd className="deck-key mr-1">↑↓</kbd> 이동
             </span>
             <span>
-              <kbd className="kbd kbd-xs">↵</kbd> 실행
+              <kbd className="deck-key mr-1">↵</kbd> 실행
             </span>
           </div>
           <span>
-            <kbd className="kbd kbd-xs">ESC</kbd> 닫기
+            <kbd className="deck-key mr-1">ESC</kbd> 닫기
           </span>
         </div>
       </div>

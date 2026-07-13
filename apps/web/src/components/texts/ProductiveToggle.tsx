@@ -14,10 +14,10 @@ export const ProductiveToggle = ({
   onKeyDown,
   checkboxRef,
 }: ProductiveToggleProps) => (
-  <label className="relative inline-flex cursor-pointer items-center">
+  <label className="group relative flex h-10 cursor-pointer items-center border border-[#303631] bg-[#080b09] p-1 font-mono text-[9px] font-bold uppercase tracking-[0.08em]">
     <input
       type="checkbox"
-      className={clsx('toggle toggle-sm', isProductive && 'toggle-success')}
+      className="peer sr-only"
       checked={isProductive}
       onChange={(e) => setIsProductive(e.target.checked)}
       onKeyDown={onKeyDown}
@@ -25,11 +25,13 @@ export const ProductiveToggle = ({
     />
     <span
       className={clsx(
-        'pointer-events-none absolute flex h-4 w-4 items-center justify-center text-[10px] font-bold text-white transition-all',
-        isProductive ? 'left-3.5' : 'left-0.5',
+        'flex h-full w-full items-center justify-center gap-1.5 border transition-colors peer-focus-visible:ring-2 peer-focus-visible:ring-[#c9ff3d]/60',
+        isProductive
+          ? 'border-[#c9ff3d]/40 bg-[#c9ff3d]/10 text-[#c9ff3d]'
+          : 'border-[#ffb52e]/40 bg-[#ffb52e]/10 text-[#ffbf49]',
       )}
     >
-      {isProductive ? '+' : '-'}
+      {isProductive ? '+ Production' : '− Consumption'}
     </span>
   </label>
 );

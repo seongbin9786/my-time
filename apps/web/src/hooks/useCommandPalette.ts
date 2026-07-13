@@ -14,7 +14,16 @@ export const useCommandPalette = () => {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       // Cmd+P (Mac) 또는 Ctrl+P (Windows/Linux)
-      if ((e.metaKey || e.ctrlKey) && e.key === 'p') {
+      if (
+        !e.isComposing &&
+        !e.altKey &&
+        !e.shiftKey &&
+        (e.metaKey || e.ctrlKey) &&
+        e.key.toLowerCase() === 'p'
+      ) {
+        const hasOpenDialog = document.querySelector('.modal-open') !== null;
+        if (!isOpen && hasOpenDialog) return;
+
         e.preventDefault(); // 브라우저 기본 동작(인쇄) 방지
         toggle();
       }
@@ -22,7 +31,7 @@ export const useCommandPalette = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [toggle]);
+  }, [isOpen, toggle]);
 
   return {
     isOpen,

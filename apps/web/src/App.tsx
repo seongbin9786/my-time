@@ -6,7 +6,22 @@ import { useEffect, useMemo } from 'react';
 import { Command, CommandPalette } from './components/CommandPalette';
 import { useCommandPalette } from './hooks/useCommandPalette';
 import { Routes } from './Routes';
-import { focusActivityInput } from './utils/commandEvents';
+import {
+  dispatchAddConsumptionStart,
+  dispatchAddProductionStart,
+  focusActivityInput,
+} from './utils/commandEvents';
+
+function isEditableTarget(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) return false;
+
+  return (
+    target.isContentEditable ||
+    target instanceof HTMLInputElement ||
+    target instanceof HTMLTextAreaElement ||
+    target instanceof HTMLSelectElement
+  );
+}
 
 export const App = () => {
   const { isOpen, close } = useCommandPalette();
@@ -14,6 +29,43 @@ export const App = () => {
   useEffect(() => {
     console.log(`[build version] ${__BUILD_VERSION__}`);
   }, []);
+
+  useEffect(() => {
+    const handleOperationalShortcuts = (event: KeyboardEvent) => {
+      const hasOpenDialog = document.querySelector('.modal-open') !== null;
+      if (isOpen || hasOpenDialog || event.isComposing) {
+        return;
+      }
+
+      if (
+        event.key === '/' &&
+        !event.altKey &&
+        !event.ctrlKey &&
+        !event.metaKey &&
+        !isEditableTarget(event.target)
+      ) {
+        event.preventDefault();
+        focusActivityInput();
+        return;
+      }
+
+      if (event.altKey && !event.ctrlKey && !event.metaKey) {
+        if (event.code === 'Digit1') {
+          event.preventDefault();
+          dispatchAddProductionStart();
+        }
+
+        if (event.code === 'Digit2') {
+          event.preventDefault();
+          dispatchAddConsumptionStart();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleOperationalShortcuts);
+    return () =>
+      window.removeEventListener('keydown', handleOperationalShortcuts);
+  }, [isOpen]);
 
   const commands: Command[] = useMemo(
     () => [
@@ -31,9 +83,7 @@ export const App = () => {
         description: '현재 시각으로 생산 활동을 시작합니다',
         icon: <PlusCircle size={18} />,
         action: () => {
-          import('./utils/commandEvents').then((module) => {
-            module.dispatchAddProductionStart();
-          });
+          dispatchAddProductionStart();
         },
         keywords: ['생산', 'production', 'start', '시작'],
       },
@@ -43,9 +93,7 @@ export const App = () => {
         description: '현재 시각으로 소비 활동을 시작합니다',
         icon: <MinusCircle size={18} />,
         action: () => {
-          import('./utils/commandEvents').then((module) => {
-            module.dispatchAddConsumptionStart();
-          });
+          dispatchAddConsumptionStart();
         },
         keywords: ['소비', 'consumption', 'start', '시작'],
       },

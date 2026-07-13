@@ -2,6 +2,161 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  color-scheme: dark;
+  background: #050705;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+body {
+  background: #050705;
+}
+
+::selection {
+  background: rgb(201 255 61 / 25%);
+  color: #f5f8f5;
+}
+
+.focus-command-deck {
+  isolation: isolate;
+  position: relative;
+  background-color: #050705;
+  background-image:
+    linear-gradient(rgb(201 255 61 / 2%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(201 255 61 / 2%) 1px, transparent 1px),
+    radial-gradient(circle at 50% -20%, rgb(201 255 61 / 7%), transparent 38%);
+  background-size: 32px 32px, 32px 32px, 100% 100%;
+}
+
+.focus-command-deck::after {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  pointer-events: none;
+  content: '';
+  opacity: 0.25;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 3px,
+    rgb(255 255 255 / 1.5%) 4px
+  );
+}
+
+.deck-key {
+  display: inline-flex;
+  min-width: 22px;
+  height: 20px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #3a423b;
+  background: #111512;
+  padding: 0 6px;
+  color: #aeb7af;
+  font-family: 'SFMono-Regular', 'Cascadia Code', ui-monospace, monospace;
+  font-size: 8px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.05em;
+  box-shadow: inset 0 -1px 0 rgb(255 255 255 / 5%);
+}
+
+.deck-key-dark {
+  height: 17px;
+  border-color: #2f3630;
+  background: #070907;
+  padding-inline: 4px;
+  color: #788179;
+}
+
+.deck-toolbar .btn {
+  min-height: 2.25rem;
+  height: 2.25rem;
+  border: 1px solid #2d342e;
+  border-radius: 0;
+  background: #0b0e0c;
+  color: #8e978f;
+  font-family: 'SFMono-Regular', 'Cascadia Code', ui-monospace, monospace;
+  font-size: 10px;
+  box-shadow: none;
+}
+
+.deck-toolbar .btn:hover {
+  border-color: rgb(201 255 61 / 55%);
+  background: #111612;
+  color: #c9ff3d;
+}
+
+.deck-toolbar .btn-primary {
+  border-color: #c9ff3d;
+  background: #c9ff3d;
+  color: #080a08;
+}
+
+.deck-toolbar .btn-primary:hover {
+  background: #dbff78;
+  color: #080a08;
+}
+
+.deck-toolbar .btn-circle {
+  width: 2.25rem;
+  padding: 0;
+}
+
+.deck-toolbar .dropdown-content {
+  border-color: #343b35;
+  border-radius: 0;
+  background: #0b0e0c;
+  color: #dfe6e0;
+}
+
+.focus-command-deck .modal-box {
+  border: 1px solid #353c36;
+  border-radius: 0;
+  background: #0b0e0c;
+  color: #e8eee9;
+  box-shadow: 0 30px 90px rgb(0 0 0 / 60%);
+}
+
+.focus-command-deck .modal-box .input,
+.focus-command-deck .modal-box .textarea,
+.focus-command-deck .modal-box .select {
+  border-color: #343b35;
+  border-radius: 0;
+  background: #080b09;
+  color: #e8eee9;
+}
+
+.focus-command-deck main > * {
+  animation: deck-panel-in 420ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.focus-command-deck main > :nth-child(2) {
+  animation-delay: 60ms;
+}
+
+.focus-command-deck main > :nth-child(3) {
+  animation-delay: 120ms;
+}
+
+@keyframes deck-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(7px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @keyframes shake {
   0% {
     transform: translateX(0);
@@ -31,4 +186,14 @@
 
 .shake-animation {
   animation: shake 600ms ease-in-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .focus-command-deck main > * {
+    animation: none;
+  }
+
+  .shake-animation {
+    animation-duration: 1ms;
+  }
 }
