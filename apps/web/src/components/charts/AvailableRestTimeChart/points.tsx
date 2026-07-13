@@ -11,7 +11,7 @@ export const getPoints = (data: ChartDataPoint[]) => {
   const points: ReactElement[] = [];
 
   if (highPoint) {
-    const color = highPoint.need >= 0 ? 'red' : 'green';
+    const color = highPoint.need >= 0 ? '#f97316' : '#06b6d4';
     points.push(
       <ReferenceDot
         key="high"
@@ -26,7 +26,7 @@ export const getPoints = (data: ChartDataPoint[]) => {
           value={formatMinutesWithSign(highPoint.need)}
           position="top"
           fill={color}
-          fontSize={14}
+          fontSize={11}
           fontWeight="bold"
         />
       </ReferenceDot>,
@@ -34,7 +34,7 @@ export const getPoints = (data: ChartDataPoint[]) => {
   }
 
   if (lowPoint) {
-    const color = lowPoint.need >= 0 ? 'red' : 'green';
+    const color = lowPoint.need >= 0 ? '#f97316' : '#06b6d4';
     points.push(
       <ReferenceDot
         key="low"
@@ -49,7 +49,7 @@ export const getPoints = (data: ChartDataPoint[]) => {
           value={formatMinutesWithSign(lowPoint.need)}
           position="bottom"
           fill={color}
-          fontSize={14}
+          fontSize={11}
           fontWeight="bold"
         />
       </ReferenceDot>,
@@ -71,7 +71,7 @@ export const getPoints = (data: ChartDataPoint[]) => {
           value={formatMinutesWithSign(currentPointConfig.point.need)}
           position={currentPointConfig.position}
           fill={currentPointConfig.color}
-          fontSize={14}
+          fontSize={11}
           fontWeight="bold"
         />
       </ReferenceDot>,
@@ -117,7 +117,7 @@ function isNearPoint(
 type CurrentPointConfig = {
   point: ChartDataPoint | null;
   shouldShow: boolean;
-  color: 'red' | 'green';
+  color: '#f97316' | '#06b6d4';
   position: 'top' | 'bottom';
 };
 
@@ -131,14 +131,14 @@ function getCurrentPointConfig(
     return {
       point: null,
       shouldShow: false,
-      color: 'red',
+      color: '#f97316',
       position: 'top',
     };
   }
 
   const shouldShow =
     !isNearPoint(currPoint, highPoint) && !isNearPoint(currPoint, lowPoint);
-  const color = currPoint.need >= 0 ? 'red' : 'green';
+  const color = currPoint.need >= 0 ? '#f97316' : '#06b6d4';
   const position = currPoint.need >= 0 ? 'top' : 'bottom';
 
   return { point: currPoint, shouldShow, color, position };

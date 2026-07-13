@@ -9,7 +9,7 @@ import { AuthModal } from './AuthModal';
 
 type AuthModalMode = 'login' | 'signup';
 
-export const AuthHeader = () => {
+export const AuthHeader = ({ compact = false }: { compact?: boolean }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { isAuthenticated, username } = useSelector(
@@ -35,7 +35,8 @@ export const AuthHeader = () => {
         <button
           type="button"
           onClick={() => openModal('login')}
-          className="btn btn-ghost btn-sm gap-1.5 rounded-lg font-medium text-base-content/70 transition-colors hover:bg-base-content/10 hover:text-base-content"
+          className={`btn btn-ghost btn-sm gap-1.5 rounded-lg font-medium text-base-content/70 transition-colors hover:bg-base-content/10 hover:text-base-content ${compact ? 'btn-square' : ''}`}
+          aria-label="로그인"
         >
           <LogIn size={15} />
         </button>
@@ -50,16 +51,19 @@ export const AuthHeader = () => {
   }
 
   return (
-    <div className="dropdown dropdown-end">
+    <div
+      className={`dropdown ${compact ? 'dropdown-end dropdown-right' : 'dropdown-end'}`}
+    >
       <button
         type="button"
         tabIndex={0}
         className="btn btn-ghost btn-sm gap-2 rounded-lg font-medium text-base-content/70 transition-colors hover:bg-base-content/10 hover:text-base-content"
+        aria-label="계정 메뉴"
       >
         <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-primary">
           <User size={14} />
         </div>
-        <span className="hidden sm:inline">{username}</span>
+        {!compact && <span className="hidden sm:inline">{username}</span>}
       </button>
       <ul
         tabIndex={0}

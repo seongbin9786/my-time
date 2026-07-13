@@ -8,8 +8,10 @@ export interface Log {
   wasted: number;
 }
 
-export const avgPaceOf = (logs: Log[]) =>
-  Math.floor(logs.reduce((acc, cur) => acc + cur.pace, 0) / logs.length);
+export const avgPaceOf = (logs: Log[]) => {
+  if (logs.length === 0) return 0;
+  return Math.floor(logs.reduce((acc, cur) => acc + cur.pace, 0) / logs.length);
+};
 
 const UNIT = 10;
 

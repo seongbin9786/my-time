@@ -14,22 +14,36 @@ export const ProductiveToggle = ({
   onKeyDown,
   checkboxRef,
 }: ProductiveToggleProps) => (
-  <label className="relative inline-flex cursor-pointer items-center">
+  <label
+    className={clsx(
+      'relative inline-flex h-9 w-[82px] shrink-0 cursor-pointer items-center rounded-lg border p-1 transition',
+      isProductive
+        ? 'border-cyan-200 bg-cyan-50'
+        : 'border-orange-200 bg-orange-50',
+    )}
+    title="Space 키로 생산/소비 전환"
+  >
     <input
       type="checkbox"
-      className={clsx('toggle toggle-sm', isProductive && 'toggle-success')}
+      className="peer sr-only"
       checked={isProductive}
       onChange={(e) => setIsProductive(e.target.checked)}
       onKeyDown={onKeyDown}
       ref={checkboxRef}
+      aria-label={isProductive ? '생산 기록' : '소비 기록'}
     />
-    <span
-      className={clsx(
-        'pointer-events-none absolute flex h-4 w-4 items-center justify-center text-[10px] font-bold text-white transition-all',
-        isProductive ? 'left-3.5' : 'left-0.5',
-      )}
-    >
-      {isProductive ? '+' : '-'}
+    <span className="pointer-events-none flex w-full items-center justify-center gap-1.5 text-xs font-bold">
+      <span
+        className={clsx(
+          'flex h-5 w-5 items-center justify-center rounded-md text-sm text-white',
+          isProductive ? 'bg-cyan-600' : 'bg-orange-500',
+        )}
+      >
+        {isProductive ? '+' : '−'}
+      </span>
+      <span className={isProductive ? 'text-cyan-800' : 'text-orange-800'}>
+        {isProductive ? '생산' : '소비'}
+      </span>
     </span>
   </label>
 );

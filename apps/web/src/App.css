@@ -2,6 +2,29 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  html,
+  body,
+  #root {
+    min-height: 100%;
+  }
+
+  body {
+    margin: 0;
+    background: #f3f6fa;
+    color: #0f172a;
+    font-family:
+      'IBM Plex Sans', 'Pretendard Variable', 'Pretendard', 'Aptos', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: geometricPrecision;
+  }
+
+  ::selection {
+    background: rgb(191 219 254 / 80%);
+    color: #172554;
+  }
+}
+
 @keyframes shake {
   0% {
     transform: translateX(0);
@@ -31,4 +54,37 @@
 
 .shake-animation {
   animation: shake 600ms ease-in-out;
+}
+
+.chart-empty-grid {
+  background-image:
+    linear-gradient(to right, rgb(226 232 240 / 55%) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(226 232 240 / 55%) 1px, transparent 1px);
+  background-size: 32px 32px;
+  mask-image: linear-gradient(
+    to bottom,
+    transparent,
+    black 35%,
+    black 65%,
+    transparent
+  );
+}
+
+.cockpit-scrollbar {
+  scrollbar-color: #334155 transparent;
+  scrollbar-width: thin;
+}
+
+.cockpit-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.cockpit-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.cockpit-scrollbar::-webkit-scrollbar-thumb {
+  border: 2px solid #020617;
+  border-radius: 999px;
+  background: #334155;
 }

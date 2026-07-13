@@ -7,32 +7,42 @@ import { LIGHT_THEMES, Theme } from './config';
 import { useTheme } from './useTheme';
 import { makeThemeNameReadable } from './util';
 
-export const ThemeSelector = () => {
+export const ThemeSelector = ({ compact = false }: { compact?: boolean }) => {
   const { theme, setTheme, availableThemes } = useTheme();
 
   return (
-    <div className="dropdown dropdown-end">
-      <ThemeSelectorButton theme={theme} />
+    <div
+      className={clsx(
+        'dropdown',
+        compact ? 'dropdown-end dropdown-right' : 'dropdown-end',
+      )}
+    >
+      <ThemeSelectorButton theme={theme} compact={compact} />
       <ThemeList
         availableThemes={availableThemes}
         currentTheme={theme}
         setTheme={setTheme}
+        compact={compact}
       />
     </div>
   );
 };
 interface ThemeSelectorButtonProps {
   theme: Theme;
+  compact: boolean;
 }
 
-function ThemeSelectorButton({ theme }: ThemeSelectorButtonProps) {
+function ThemeSelectorButton({ theme, compact }: ThemeSelectorButtonProps) {
   const isLightTheme = LIGHT_THEMES.includes(theme);
   const IconComponent = isLightTheme ? Sun : Moon;
 
   return (
     <button
       tabIndex={0}
-      className="btn btn-circle btn-ghost transition-transform duration-200 hover:rotate-12"
+      className={clsx(
+        'btn btn-circle btn-ghost transition-transform duration-200 hover:rotate-12',
+        compact && 'btn-sm',
+      )}
       aria-label="테마 선택"
     >
       <IconComponent size={16} />
@@ -44,17 +54,22 @@ interface ThemeListProps {
   availableThemes: readonly Theme[];
   currentTheme: Theme;
   setTheme: (theme: Theme) => void;
+  compact: boolean;
 }
 
 function ThemeList({
   availableThemes,
   currentTheme,
   setTheme,
+  compact,
 }: ThemeListProps) {
   return (
     <ul
       tabIndex={0}
-      className="menu dropdown-content rounded-box z-[1] mt-3 max-h-96 w-[400px] overflow-y-auto bg-base-200 p-2 shadow"
+      className={clsx(
+        'menu dropdown-content rounded-box z-[1] max-h-96 w-[400px] overflow-y-auto bg-base-200 p-2 shadow',
+        compact ? 'ml-3' : 'mt-3',
+      )}
     >
       {availableThemes.map((themeName) => (
         <ThemeListItem

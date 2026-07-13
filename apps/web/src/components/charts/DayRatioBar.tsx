@@ -8,7 +8,7 @@ export const DayRatioBar = ({ logs }: { logs: Log[] }) => {
 
   if (isEmpty || totalDuration <= 0) {
     return (
-      <div className="flex h-3 w-full min-w-0 overflow-hidden rounded-full bg-gray-200" />
+      <div className="flex h-2 w-full min-w-0 overflow-hidden rounded-full bg-slate-100" />
     );
   }
 
@@ -36,14 +36,14 @@ export const DayRatioBar = ({ logs }: { logs: Log[] }) => {
 
   return (
     <div
-      className="isolate flex h-3 w-full min-w-0 transform-gpu flex-nowrap overflow-hidden rounded-full bg-gray-100"
+      className="isolate flex h-2 w-full min-w-0 transform-gpu flex-nowrap overflow-hidden rounded-full bg-slate-100"
       style={{ WebkitMaskImage: '-webkit-radial-gradient(white, black)' }}
     >
       {blocks.map((block, idx) => (
         <div
           key={idx}
-          className={`transition-all duration-500 ease-in-out ${
-            block.type === 'productive' ? 'bg-green-500' : 'bg-red-500'
+          className={`transition-[width] duration-500 ease-in-out ${
+            block.type === 'productive' ? 'bg-cyan-500' : 'bg-orange-400'
           }`}
           style={{ width: `${(block.duration / totalDuration) * 100}%` }}
           title={`${block.type === 'productive' ? '생산' : '소비'}: ${block.duration}분`}

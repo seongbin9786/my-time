@@ -22,31 +22,23 @@ export const TimeSummary = ({ logs }: TimeSummaryProps) => {
   const wastedRatio = hasAnyLogs ? 100 - _ratio : 0;
 
   const isProductiveSurplus = difference >= 0;
-  const label = isProductiveSurplus ? '확보 시간' : '초과 시간';
-  const colorClass = isProductiveSurplus ? 'text-green-600' : 'text-red-600';
 
   return (
-    <div className="flex gap-1 text-lg">
+    <div className="mt-3 flex items-center gap-5 text-[11px] text-slate-500">
       <span>
-        {label}: [
-        <span className={`font-bold ${colorClass}`}>
+        현재 균형{' '}
+        <strong
+          className={isProductiveSurplus ? 'text-cyan-700' : 'text-orange-700'}
+        >
+          {isProductiveSurplus ? '+' : '−'}
           {minutesToTimeString(Math.abs(difference))}
-        </span>
-        ]
+        </strong>
       </span>
       <span>
-        생산{' '}
-        <span className="font-bold text-green-600">
-          {minutesToTimeString(productive)}
-        </span>{' '}
-        ({productiveRatio}%)
+        생산 <strong className="text-slate-800">{productiveRatio}%</strong>
       </span>
       <span>
-        소비{' '}
-        <span className="font-bold text-red-600">
-          {minutesToTimeString(wasted)}
-        </span>{' '}
-        ({wastedRatio}%)
+        소비 <strong className="text-slate-800">{wastedRatio}%</strong>
       </span>
     </div>
   );
